@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プロジェクトマーケット — プロトタイプ</title>
+<style>
+  /* ===== デザインの土台（色・書体）=====
+     ここの変数を書き換えるだけで全体の見た目が変わります。バイブコーディング入門用に、
+     いじると何が変わるか分かりやすい場所からまとめてあります。 */
+  :root{
+    --bg:#0d1017;          /* 背景 */
+    --panel:#151a24;       /* カード背景 */
+    --panel-2:#1b2230;     /* 少し明るいカード */
+    --line:#252d3d;        /* 罫線 */
+    --text:#e8ecf3;        /* 文字 */
+    --muted:#8a93a6;       /* 補助文字 */
+    --brand:#7c6cff;       /* ブランドの差し色（紫） */
+    --up:#2ec26b;          /* 株価アップ（緑） */
+    --down:#ff5d6c;        /* 株価ダウン（赤） */
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 80% -10%, #1a2030 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  a{color:inherit}
+  button{font-family:inherit;cursor:pointer;border:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+  /* ===== ヘッダー ===== */
+  header{position:sticky;top:0;z-index:50;background:rgba(13,16,23,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .topbar{display:flex;align-items:center;gap:20px;height:62px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.02em}
+  .logo .mark{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--brand),#4ad0ff);display:grid;place-items:center;font-size:15px}
+  .logo small{color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.14em}
+  nav{display:flex;gap:4px;margin-left:auto}
+  nav button{background:transparent;color:var(--muted);padding:8px 14px;border-radius:10px;font-weight:700;font-size:14px}
+  nav button.active{background:var(--panel-2);color:var(--text)}
+  .wallet{display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--line);padding:7px 12px;border-radius:12px;font-weight:700;font-size:13px}
+  .wallet b{color:var(--brand)}
+
+  /* ===== ティッカー（流れる株価）===== */
+  .ticker{border-bottom:1px solid var(--line);background:var(--panel);overflow:hidden;white-space:nowrap}
+  .ticker .track{display:inline-block;padding:8px 0;animation:scroll 34s linear infinite}
+  .ticker span{margin:0 20px;font-size:13px;font-weight:700;color:var(--muted)}
+  .ticker span b{color:var(--text);margin-right:8px}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ===== 共通パーツ ===== */
+  .hero{padding:34px 0 10px}
+  .hero h1{font-size:30px;margin:0 0 8px;letter-spacing:-.01em}
+  .hero p{color:var(--muted);margin:0;font-size:15px;line-height:1.7}
+
+  /* 口座サマリー */
+  .account{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:26px 0 8px;flex-wrap:wrap}
+  .acc-cell{flex:1;min-width:120px;background:var(--panel);padding:16px 18px}
+  .acc-cell span{display:block;font-size:11px;color:var(--muted);font-weight:700}
+  .acc-cell b{display:block;font-size:20px;margin-top:5px;letter-spacing:-.01em}
+  .acc-cell.hero-cell{background:linear-gradient(135deg,rgba(124,108,255,.22),rgba(74,208,255,.10));min-width:170px}
+  .acc-cell.hero-cell span{color:#c9c2ff}
+  .acc-cell.hero-cell b{font-size:16px}
+  .tagline{margin:12px 2px 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+  .tagline b{color:#c9c2ff;font-weight:700}
+  /* メモ（事業のもろもろ収納） */
+  .memo-sec{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:14px}
+  .memo-sec>h3{margin:0 0 10px;font-size:15px}
+  .memo-sec p{margin:6px 0;font-size:13.5px;color:var(--muted);line-height:1.75}
+  .memo-sec p b,.memo-sec li b,.memo-tbl td b{color:var(--text)}
+  .memo-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .memo-tbl{width:100%;border-collapse:collapse;font-size:13px}
+  .memo-tbl td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--muted)}
+  .memo-tbl td:first-child{white-space:nowrap;color:var(--brand);font-weight:800;width:110px}
+  .memo-tbl tr:last-child td{border-bottom:none}
+  .memo-ul{margin:4px 0 0;padding-left:18px}
+  .memo-ul li{margin:6px 0;font-size:13px;color:var(--muted)}
+  .memo-log{font-size:12.5px;color:var(--muted);line-height:1.95}
+  .memo-launch{background:linear-gradient(135deg,rgba(124,108,255,.16),rgba(74,208,255,.08));border:1px solid rgba(124,108,255,.35)}
+  .memo-launch .btn{margin-top:10px;display:inline-block;width:auto;padding:11px 20px}
+  @media(max-width:640px){.memo-grid{grid-template-columns:1fr}}
+
+  /* セクション見出し */
+  .sec-head{display:flex;align-items:center;gap:14px;margin:30px 0 14px}
+  .sec-head h2{font-size:18px;margin:0}
+  #rank-tabs{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+  #rank-tabs button{background:transparent;color:var(--muted);font-weight:700;font-size:13px;padding:6px 12px;border-radius:9px}
+  #rank-tabs button.active{background:var(--panel-2);color:var(--text)}
+
+  /* ランキング（順位つきの行）*/
+  .ranking{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .rk{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer;transition:.12s}
+  .rk:hover{border-color:var(--brand)}
+  .rk .pos{font-size:15px;font-weight:800;color:var(--muted);width:22px;text-align:center}
+  .rk .pos.top{color:var(--brand)}
+  .rk .rkname{flex:1;min-width:0}
+  .rk .rkname b{font-size:14px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rk .rkname span{font-size:11px;color:var(--muted)}
+  .rk .rkprice{text-align:right;white-space:nowrap}
+  .rk .rkprice b{font-size:14px}
+  .rk .rkprice .delta{font-size:11px;padding:2px 6px;margin-top:2px}
+  .rk-empty{grid-column:1/-1;color:var(--muted);text-align:center;padding:24px;background:var(--panel);border:1px dashed var(--line);border-radius:12px}
+
+  /* ウォッチ★ */
+  .star{position:absolute;top:14px;right:14px;background:transparent;font-size:20px;line-height:1;color:#39415a;z-index:2;padding:2px}
+  .star.on{color:#ffcf4d}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:22px 0 16px}
+  .search{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+  .search input{background:transparent;border:none;color:var(--text);outline:none;width:100%;font-size:14px}
+  .chip{background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700}
+  .chip.active{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn{background:var(--brand);color:#fff;padding:11px 18px;border-radius:12px;font-weight:800;font-size:14px}
+  .btn.ghost{background:var(--panel-2);color:var(--text);border:1px solid var(--line)}
+  .btn:active{transform:translateY(1px)}
+  .up{color:var(--up)} .down{color:var(--down)}
+
+  /* ===== マーケット一覧（カード）===== */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding-bottom:60px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
+  .card:hover{border-color:var(--brand);transform:translateY(-2px)}
+  .card .cat{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--brand);text-transform:uppercase}
+  .badge{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:8px;letter-spacing:.02em;vertical-align:middle;text-transform:none}
+  .badge.cont{background:rgba(124,108,255,.16);color:#a99dff}
+  .badge.once{background:rgba(255,168,74,.16);color:#ffb15e}
+  .badge.ouen{background:rgba(46,194,107,.16);color:#7fe0a6}
+  .badge.toshi{background:rgba(255,120,140,.18);color:#ff9db0}
+  .card h3{margin:6px 0 4px;font-size:18px}
+  .card .tag{color:var(--muted);font-size:13px;line-height:1.5;height:39px;overflow:hidden}
+  .row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px}
+  .price{font-size:24px;font-weight:800;letter-spacing:-.02em}
+  .price small{font-size:12px;color:var(--muted);font-weight:600;margin-left:2px}
+  .delta{font-size:13px;font-weight:800;padding:3px 8px;border-radius:8px}
+  .delta.u{background:rgba(46,194,107,.12);color:var(--up)}
+  .delta.d{background:rgba(255,93,108,.12);color:var(--down)}
+  .meta{display:flex;gap:16px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  .meta b{color:var(--text);font-weight:700}
+  .spark{position:absolute;right:0;bottom:0;opacity:.5}
+
+  /* ===== 詳細モーダル ===== */
+  .overlay{position:fixed;inset:0;background:rgba(5,7,12,.72);backdrop-filter:blur(4px);z-index:100;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}
+  .overlay.open{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:20px;max-width:720px;width:100%;padding:26px}
+  .modal .close{position:absolute;right:16px;top:14px;background:var(--panel-2);color:var(--muted);width:34px;height:34px;border-radius:10px;font-size:18px}
+  .modal-head{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .modal h2{margin:4px 0 6px;font-size:24px}
+  .founder{color:var(--muted);font-size:13px}
+  .bigprice{text-align:right}
+  .bigprice .p{font-size:32px;font-weight:800}
+  .chart{margin:20px 0;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+  .stat{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .stat .k{font-size:11px;color:var(--muted);font-weight:700}
+  .stat .v{font-size:17px;font-weight:800;margin-top:3px}
+  /* 個別銘柄ページ */
+  .stabs{display:flex;gap:4px;margin:18px 0 12px;border-bottom:1px solid var(--line)}
+  .stabs button{background:transparent;color:var(--muted);font-weight:800;font-size:13px;padding:9px 14px;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .stabs button.active{color:var(--text);border-bottom-color:var(--brand)}
+  .chart-wrap{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:14px;position:relative}
+  .bchart{cursor:crosshair}
+  .cxtip{position:absolute;top:20px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);color:var(--text);font-size:12px;font-weight:800;padding:3px 9px;border-radius:8px;pointer-events:none;opacity:0;transition:opacity .1s;white-space:nowrap;z-index:2}
+  .tfbar{display:flex;gap:6px;margin-bottom:10px}
+  .tfbar button{background:transparent;color:var(--muted);font-weight:700;font-size:12px;padding:4px 11px;border-radius:8px}
+  .tfbar button.active{background:var(--panel);color:var(--text)}
+  .bchart{width:100%;height:auto;display:block}
+  /* 板 */
+  .obhead{display:grid;grid-template-columns:1fr 88px 1fr;font-size:11px;color:var(--muted);font-weight:700;padding:7px 12px;background:var(--panel);border:1px solid var(--line);border-bottom:none;border-radius:12px 12px 0 0}
+  .ob{background:var(--panel-2);border:1px solid var(--line);border-radius:0 0 12px 12px;overflow:hidden}
+  .obrow{display:grid;grid-template-columns:1fr 88px 1fr;align-items:stretch;font-size:12.5px;border-bottom:1px solid var(--line)}
+  .obrow:last-child{border-bottom:none}
+  .obrow.cur{background:rgba(124,108,255,.12)}
+  .obrow .q{padding:8px 12px;position:relative;display:flex;align-items:center;min-height:34px}
+  .obrow .q.sell{justify-content:flex-start;color:#ff9db0;font-weight:700}
+  .obrow .q.buy{justify-content:flex-end;color:#7fe0a6;font-weight:700}
+  .obrow .bar{position:absolute;top:0;bottom:0}
+  .obrow .bar.sell{left:0;background:rgba(255,93,108,.16)}
+  .obrow .bar.buy{right:0;background:rgba(46,194,107,.16)}
+  .obrow .qv{position:relative;z-index:1}
+  .obrow.act{cursor:pointer;transition:background .1s}
+  .obrow.act:hover{background:rgba(124,108,255,.10)}
+  .obrow .hint{opacity:0;transition:opacity .1s;font-size:11px;font-weight:800}
+  .obrow.act:hover .hint{opacity:1}
+  .obrow .hint.g{color:#7fe0a6;justify-content:flex-end}
+  .obrow .hint.r{color:#ff9db0;justify-content:flex-start}
+  .obrow .px{text-align:center;font-weight:800;padding:8px 0;border-left:1px solid var(--line);border-right:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .obnote{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  /* 注文伝票 */
+  .ticket{margin-top:16px;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .tk-side{display:flex;gap:8px;margin-bottom:12px}
+  .tk-side button{flex:1;background:var(--panel);color:var(--muted);font-weight:800;font-size:13px;padding:10px;border-radius:10px;border:1px solid var(--line)}
+  .tk-side button.active.buy{background:rgba(46,194,107,.16);color:#7fe0a6;border-color:rgba(46,194,107,.4)}
+  .tk-side button.active.sell{background:rgba(255,93,108,.16);color:#ff9db0;border-color:rgba(255,93,108,.4)}
+  .tk-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+  .tk-field label{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:5px}
+  .step{display:flex;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .step button{width:38px;height:38px;background:transparent;color:var(--text);font-size:18px;font-weight:800}
+  .step button:hover{background:var(--line)}
+  .step span{flex:1;text-align:center;font-weight:800;font-size:15px}
+  .tk-sum{display:flex;justify-content:space-between;align-items:baseline;padding:8px 2px 2px;border-top:1px solid var(--line);margin-top:4px}
+  .tk-sum span{font-size:12px;color:var(--muted);font-weight:700}
+  .tk-sum b{font-size:20px}
+  .tk-meta{font-size:11px;color:var(--muted);margin:4px 2px 12px}
+  .tk-go{width:100%;padding:13px;border-radius:12px;font-weight:800;font-size:15px;color:#0d1017}
+  .tk-go.buy{background:linear-gradient(135deg,#3ddc84,#2ec26b)}
+  .tk-go.sell{background:linear-gradient(135deg,#ff8a97,#ff5d6c)}
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:2px 0 16px}
+  .kpi{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .kpi .k{font-size:11px;color:var(--muted);font-weight:700}
+  .kpi .v{font-size:19px;font-weight:800;margin-top:3px}
+  .kpi .s{font-size:11px;margin-top:2px;color:var(--muted)}
+  /* マイルストーン */
+  .mstone{margin:4px 0 16px}
+  .mrow{display:flex;gap:12px;align-items:flex-start;padding:5px 0}
+  .mrow .dot{width:15px;height:15px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;margin-top:3px}
+  .mrow.done .dot{background:var(--up);border-color:var(--up)}
+  .mrow.now .dot{border-color:var(--brand);box-shadow:0 0 0 3px rgba(124,108,255,.22)}
+  .mrow .mt{font-size:13px}
+  .mrow.done .mt{color:var(--muted)}
+  .mrow .mt small{display:block;color:var(--muted);font-size:11px}
+  /* 発起人アップデート */
+  .upd{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .upd .ut{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:3px}
+  .upd .um{font-size:13px;line-height:1.7}
+  .desc{color:#c3cad8;line-height:1.8;font-size:14px}
+  .maturity{background:rgba(255,168,74,.10);border:1px solid rgba(255,168,74,.3);color:#ffd9ab;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;margin-bottom:4px}
+  .maturity b{color:#ffb15e}
+  .riskbox{background:rgba(255,93,108,.09);border:1px solid rgba(255,93,108,.3);color:#ffc2c9;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;margin-top:14px}
+  .riskbox b{color:#ff9db0}
+  .ouenbox{background:rgba(46,194,107,.09);border:1px solid rgba(46,194,107,.3);color:#bff0d3;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;margin-top:14px}
+  .ouenbox b{color:#7fe0a6}
+  .progress{height:10px;background:var(--panel-2);border-radius:999px;overflow:hidden;margin:8px 0}
+  .progress span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),#4ad0ff)}
+  .actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+  .actions .btn{flex:1;min-width:120px;text-align:center}
+
+  /* ===== 上場申請フォーム ===== */
+  .form{max-width:640px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px;margin-bottom:60px}
+  .form label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin:16px 0 6px}
+  .form input,.form textarea,.form select{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none}
+  .form textarea{min-height:90px;resize:vertical}
+  .form input:focus,.form textarea:focus,.form select:focus{border-color:var(--brand)}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  .hint b{color:#c3cad8}
+  /* 上場基準 */
+  .criteria{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+  .crit{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .crit .n{font-size:11px;font-weight:800;color:var(--brand);letter-spacing:.1em}
+  .crit b{display:block;margin:4px 0 4px;font-size:14px}
+  .crit span{font-size:12px;color:var(--muted);line-height:1.6}
+  /* 本人確認 */
+  .kyc{margin-top:20px;background:rgba(124,108,255,.06);border:1px solid rgba(124,108,255,.28);border-radius:14px;padding:16px}
+  .kyc-head{font-weight:800;font-size:14px;margin-bottom:4px}
+  .kyc .chk{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted);font-weight:600;margin-top:12px;cursor:pointer}
+  .kyc .chk input{width:auto;margin-top:2px}
+  /* 審査中カード */
+  .pend{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .pend .info{flex:1}
+  .pend .info b{font-size:15px}
+  .pend .info div{font-size:12px;color:var(--muted);margin-top:2px}
+  .status{font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;white-space:nowrap}
+  .status.scr{background:rgba(74,208,255,.14);color:#4ad0ff}
+  .status.rev{background:rgba(255,168,74,.14);color:#ffb15e}
+  .status.ok{background:rgba(46,194,107,.14);color:var(--up)}
+  .status.ng{background:rgba(255,93,108,.14);color:var(--down)}
+  .spin{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,177,94,.35);border-top-color:#ffb15e;border-radius:50%;animation:sp .7s linear infinite;margin-right:6px;vertical-align:-1px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* ===== ポートフォリオ ===== */
+  .pf-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+  .pf-summary .stat .v{font-size:22px}
+  .holding{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .holding .name{flex:1}
+  .holding .name b{font-size:15px}
+  .holding .name div{font-size:12px;color:var(--muted)}
+  .empty{text-align:center;color:var(--muted);padding:60px 20px}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--panel-2);border:1px solid var(--brand);color:var(--text);padding:13px 20px;border-radius:12px;font-weight:700;font-size:14px;opacity:0;transition:.3s;z-index:200;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .hidden{display:none!important}
+  @media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.pf-summary{grid-template-columns:1fr}.hero h1{font-size:24px}}
+
+  /* ===== スマホ最適化 ===== */
+  @media(max-width:720px){
+    .wrap{padding:0 14px}
+    /* ヘッダー：ロゴ＋残高の行と、ナビの行に分けて折り返す */
+    .topbar{height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding:8px 0;row-gap:6px}
+    .logo{font-size:15px}
+    .logo small{display:none}
+    .logo .mark{width:24px;height:24px;font-size:14px}
+    nav{margin-left:0;order:3;width:100%;justify-content:space-between;gap:4px}
+    nav button{flex:1;padding:9px 6px;font-size:13px;text-align:center}
+    .wallet{margin-left:auto;font-size:12px;padding:6px 10px}
+    /* ランキングは1列 */
+    .ranking{grid-template-columns:1fr}
+    /* 口座サマリーは2列で見やすく */
+    .acc-cell{min-width:46%}
+    .acc-cell.hero-cell{min-width:100%}
+    /* モーダル・チャート・進捗を詰める */
+    .modal{padding:18px 16px;border-radius:16px}
+    .modal-head{gap:10px}
+    .bigprice .p{font-size:26px}
+    .stabs button{padding:9px 10px;font-size:13px}
+    .kpis{grid-template-columns:1fr}
+    .tk-grid{grid-template-columns:1fr}
+    /* セクション見出しと検索を詰める */
+    .sec-head{gap:8px;flex-wrap:wrap}
+    .toolbar{gap:8px}
+    .search{flex:1 1 100%}
+    /* 横長になりがちな表は横スクロール可に */
+    .memo-tbl{display:block;overflow-x:auto}
+    .hero{padding:22px 0 8px}
+  }
+  @media(max-width:400px){
+    nav button{font-size:12px;padding:8px 4px}
+    .acc-cell b{font-size:18px}
+    .card h3{font-size:16px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="logo">
+      <span class="mark">📈</span>
+      <div>プロジェクトマーケット<small style="display:block">PROJECT MARKET</small></div>
+    </div>
+    <nav>
+      <button data-view="market" class="active">マーケット</button>
+      <button data-view="portfolio">ポートフォリオ</button>
+      <button data-view="memo">メモ</button>
+    </nav>
+    <div class="wallet">残高 <b id="cash">¥1,000,000</b></div>
+  </div>
+  <div class="ticker"><div class="track" id="ticker"></div></div>
+</header>
+
+<!-- ===== マーケット ===== -->
+<main class="wrap">
+  <section id="view-market">
+    <!-- 口座サマリー（ネット証券のトップにある“あなたの口座”）-->
+    <div class="account">
+      <div class="acc-cell hero-cell">
+        <span>プロジェクトマーケット</span>
+        <b>マイダッシュボード</b>
+      </div>
+      <div class="acc-cell"><span>総資産</span><b id="acc-total">¥1,000,000</b></div>
+      <div class="acc-cell"><span>評価損益</span><b id="acc-pl" class="up">±¥0</b></div>
+      <div class="acc-cell"><span>現金残高</span><b id="acc-cash">¥1,000,000</b></div>
+      <div class="acc-cell"><span>保有銘柄</span><b id="acc-hold">0</b></div>
+    </div>
+    <div class="tagline">クラウドファンディングではなく、プロジェクトの<b>証券取引所</b>。<b>IPO前</b>から応援でき、実績を出せば<b>IPO（上場）</b>で配当が解禁、いずれ<b>二次流通</b>へ。</div>
+
+    <!-- ランキング（値上がり率・応援数・満期間近・ウォッチ）-->
+    <div class="sec-head"><h2>ランキング</h2><div id="rank-tabs"></div></div>
+    <div id="ranking" class="ranking"></div>
+
+    <!-- 全銘柄 -->
+    <div class="sec-head"><h2>すべての銘柄</h2></div>
+    <div class="toolbar">
+      <div class="search">🔍<input id="q" placeholder="プロジェクト名・キーワードで検索"></div>
+      <div id="types"></div>
+      <div id="cats"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- ===== ポートフォリオ ===== -->
+  <section id="view-portfolio" class="hidden">
+    <div class="account">
+      <div class="acc-cell hero-cell"><span>マイポートフォリオ</span><b>保有状況</b></div>
+      <div class="acc-cell"><span>総資産</span><b id="pf-total">¥1,000,000</b></div>
+      <div class="acc-cell"><span>評価損益</span><b id="pf-pl" class="up">±¥0</b></div>
+      <div class="acc-cell"><span>現金残高</span><b id="pf-cash">¥1,000,000</b></div>
+      <div class="acc-cell"><span>保有銘柄</span><b id="pf-hold">0</b></div>
+    </div>
+    <div class="sec-head"><h2>保有銘柄</h2></div>
+    <div id="holdings"></div>
+  </section>
+
+  <!-- ===== 上場申請 ===== -->
+  <section id="view-ipo" class="hidden">
+    <button class="btn ghost" style="margin:8px 0 4px" onclick="show('memo')">← メモへ戻る</button>
+    <div class="hero">
+      <h1>上場するには、AI審査を通過する必要があります。</h1>
+      <p>ここは、誰でも載せられるクラウドファンディングではありません。<br>上場の前提として<b style="color:var(--text)">本人確認（住民票・戸籍謄本など）</b>と<b style="color:var(--text)">反社・AMLチェック</b>を行い、そのうえで提出内容を<b style="color:var(--text)">AIが上場基準に照らして審査</b>します。通過した挑戦だけが市場に並ぶ。だから出資する側は、"実在する人物の、審査を通った挑戦"にだけ向き合える。</p>
+    </div>
+
+    <h3 style="margin:8px 0 12px;font-size:15px;color:var(--muted);font-weight:700">上場基準（審査で見るポイント）</h3>
+    <div class="criteria">
+      <div class="crit"><div class="n">01</div><b>実現可能性</b><span>ゴールが具体的で、達成までの道筋・体制が描けているか。</span></div>
+      <div class="crit"><div class="n">02</div><b>発起人の本気度と実績</b><span>過去の活動・進捗が確認でき、途中で投げ出さないか。</span></div>
+      <div class="crit"><div class="n">03</div><b>リターン設計の妥当性</b><span>出資者に返すもの（分配・体験・権利）が現実的で誠実か。</span></div>
+      <div class="crit"><div class="n">04</div><b>健全性</b><span>社会的に問題がなく、誇大・虚偽の表示がないか。</span></div>
+      <div class="crit"><div class="n">05</div><b>情報開示</b><span>進捗と資金の使途を、継続して公開する意思があるか。</span></div>
+      <div class="crit"><div class="n">06</div><b>反社・AML</b><span>反社会的勢力でないか、資金の出所は健全か（暴排条項に同意）。</span></div>
+    </div>
+
+    <div class="form">
+      <h3 style="margin:0 0 4px;font-size:18px">上場審査をリクエストする</h3>
+      <div class="hint" style="margin-bottom:6px">送信すると<b>審査待ち</b>に入ります。この場では即上場されません（下の「審査中」に並びます）。</div>
+      <label>プロジェクト名 *</label>
+      <input id="f-name" placeholder="例：地方の空き家を宿に変えるプロジェクト">
+      <label>ひとことキャッチ *</label>
+      <input id="f-tag" placeholder="例：眠っている家を、泊まれる資産に。">
+      <label>カテゴリ</label>
+      <select id="f-cat"><option>地域</option><option>テック</option><option>フード</option><option>教育</option><option>ヘルスケア</option><option>エンタメ</option><option>イベント</option><option>アニメ・作品</option><option>ファッション</option><option>挑戦</option><option>研究</option><option>出版</option><option>AI</option><option>IT</option><option>農業</option><option>福祉</option><option>伝統</option></select>
+      <label>発起人</label>
+      <input id="f-founder" placeholder="例：金杉さん">
+      <label>プロジェクト概要（審査材料）</label>
+      <textarea id="f-desc" placeholder="何を、誰のために、どう実現するのか。実績や進捗も書けると審査が通りやすくなります。"></textarea>
+      <label>初値(想定株価) / 調達目標</label>
+      <div style="display:flex;gap:10px">
+        <input id="f-price" type="number" value="1000" style="flex:1">
+        <input id="f-goal" type="number" value="3000000" style="flex:1.4">
+      </div>
+      <label>銘柄タイプ</label>
+      <select id="f-type">
+        <option value="継続">継続 — 毎シーズン取引され続ける（アプリ・店・事業など）</option>
+        <option value="単発">単発 — 達成したら償還して上場廃止（イベント・挑戦など）</option>
+      </select>
+      <div id="f-deadline-wrap" class="hidden">
+        <label>満期日（この日までに達成を目指す）</label>
+        <input id="f-deadline" type="date">
+      </div>
+
+      <div class="kyc">
+        <div class="kyc-head">🔒 本人確認（必須）</div>
+        <div class="hint" style="margin:0 0 4px">なりすまし・架空プロジェクトを防ぐため、発起人の実在確認を厳格に行います。書類は暗号化して保管され、公開されません。</div>
+        <label>本名（戸籍上の氏名）*</label>
+        <input id="k-name" placeholder="例：金杉 太郎">
+        <label>生年月日 *</label>
+        <input id="k-birth" type="date">
+        <label>本人確認書類の種類 *</label>
+        <select id="k-doc">
+          <option value="">選択してください</option>
+          <option>住民票（本籍記載）</option>
+          <option>戸籍謄本</option>
+          <option>マイナンバーカード</option>
+          <option>運転免許証＋補助書類</option>
+        </select>
+        <label>書類のアップロード *</label>
+        <input id="k-file" type="file">
+        <label class="chk"><input type="checkbox" id="k-agree"> 記載内容に相違なく、本人確認書類を提出することに同意します。</label>
+        <label class="chk"><input type="checkbox" id="k-antisocial"> 私は反社会的勢力ではなく、関係もありません（暴力団排除条項に同意し、資金の出所が健全であることを表明します）。</label>
+      </div>
+
+      <button class="btn" style="width:100%;margin-top:22px" id="ipo-submit">🤖 AI審査に提出する</button>
+    </div>
+
+    <div id="pending-wrap" class="hidden">
+      <h3 style="margin:10px 0 12px;font-size:15px;color:var(--muted);font-weight:700">審査中のプロジェクト</h3>
+      <div id="pending"></div>
+      <div class="hint">※ 本番では運営チームが審査します。ここでは体感用に、あなた自身が審査結果を出せます。</div>
+    </div>
+  </section>
+
+  <!-- ===== メモ（事業のぜんぶを収納） ===== -->
+  <section id="view-memo" class="hidden">
+    <div class="sec-head"><h2>メモ ── この事業のぜんぶ</h2></div>
+    <div class="tagline" style="margin:-6px 2px 16px">デモの裏にある、コンセプト・決定・計画・審査をここに収納。<b>プロジェクトを“上場”させる、プロジェクトの証券取引所。</b> プロジェクトエコノミー時代の取引所。</div>
+
+    <div class="memo-sec memo-launch">
+      <h3>📋 上場審査（応募）</h3>
+      <p>誰でも載せられるクラファンではなく、<b>応募 →（本人確認・反社/AML・AI審査の）三段審査 → 通過した挑戦だけが上場</b>。ここから応募フローを開けます。</p>
+      <button class="btn" onclick="show('ipo')">上場審査を開く →</button>
+    </div>
+
+    <div class="memo-sec">
+      <h3>🧭 一言コンセプト</h3>
+      <p>あらゆるプロジェクトを“銘柄”として上場。応援で株価が動き、育てば配当、いずれ二次流通へ。クラファンではなく<b>取引所</b>。〈IPO前（未上場）→ IPO（上場・配当）→ 二次流通〉の一本道。</p>
+    </div>
+
+    <div class="memo-sec">
+      <h3>✅ 決定ログ</h3>
+      <table class="memo-tbl">
+        <tr><td>名称</td><td>プロジェクトマーケット（PROJECT MARKET）。『プロジェクト大全』著者ブランドと地続き。</td></tr>
+        <tr><td>位置づけ</td><td>クラファンでなく証券取引所。IPO前→上場→二次流通。</td></tr>
+        <tr><td>主モード</td><td>二層で両立（IPO前＝応援・非金銭 / 上場＝投資・配当）。</td></tr>
+        <tr><td>審査</td><td>三段関門：本人確認（住民票・戸籍）→ 反社・AML → AI審査。入口は「応募」。</td></tr>
+        <tr><td>参入障壁</td><td>審査は衛生要因。堀は ①流動性 ②免許 ③時間の信頼 ④発起人ブランド×上場講座。</td></tr>
+        <tr><td>株価</td><td>証券化しない“指数”。実績×応援。値下がりで元本を痛めない設計。</td></tr>
+        <tr><td>銘柄タイプ</td><td>単発（満期で償還）／ 継続。</td></tr>
+      </table>
+    </div>
+
+    <div class="memo-grid">
+      <div class="memo-sec" style="margin:0">
+        <h3>💠 事業モデル</h3>
+        <p>リターン3階建て：<b>L1 応援</b>（非金銭）／<b>L2 優待</b>（疑似配当）／<b>L3 投資</b>（金銭分配）。軽く始め、育った銘柄だけ本格化。</p>
+        <p>収益源：上場・審査手数料、取引手数料、投資型の運用フィー、<b>上場講座の受講料</b>。</p>
+      </div>
+      <div class="memo-sec" style="margin:0">
+        <h3>🎓 上場講座（供給エンジン）</h3>
+        <p>セミナー＋本講座（全6回）。<b>修了＝上場</b>。挑戦者が生まれる場所を押さえ、<b>オープン時に並べる“最初の挑戦”を自前でそろえ</b>、<b>先に収益</b>が立つ。参入障壁④の実装。</p>
+      </div>
+    </div>
+
+    <div class="memo-sec">
+      <h3>🎓 上場講座 カリキュラム（全6回）</h3>
+      <table class="memo-tbl">
+        <tr><td>入口</td><td>セミナー（90分）「あなたのプロジェクトを“上場”させる」— 考え方・事例で火をつける。</td></tr>
+        <tr><td>第1回</td><td>プロジェクトの核を定義（要件定義・キャッチ）</td></tr>
+        <tr><td>第2回</td><td>実現可能性とロードマップ（マイルストーン・資金）</td></tr>
+        <tr><td>第3回</td><td>リターン設計と“株価が動く”物語</td></tr>
+        <tr><td>第4回</td><td>発起人ストーリーと情報開示（本人確認の準備）</td></tr>
+        <tr><td>第5回</td><td>健全性と規制の基礎（反社・AML／金商法の距離）※専門家監修</td></tr>
+        <tr><td>第6回</td><td>上場審査シミュレーション → <b>修了＝上場</b></td></tr>
+      </table>
+    </div>
+
+    <div class="memo-sec">
+      <h3>🛡 コンプライアンス要点</h3>
+      <p><b>最大の急所：</b>「株価・配当・持分」を名乗ると金商法（みなし有価証券・第二種）に入り得る。<b>非金銭に留めるか／登録して金銭分配するか</b>の線引きが根幹。反社・AML・本人確認は三段関門で担保。実装時は弁護士・登録業者の確認が前提。</p>
+    </div>
+
+    <div class="memo-sec">
+      <h3>⚖️ 市場の健全性／不正防止 <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;background:rgba(255,168,74,.16);color:#ffb15e;margin-left:6px">案</span></h3>
+      <p>株価がある以上、仕手（つり上げ）・買い占めは寄ってくる。特に<b>時価総額の小さい銘柄</b>は少額で動かせて狙われやすい。設計で構造的に潰す。<b>乗っ取りは「価格操縦」と「支配権の掌握」の2種</b>。</p>
+      <p style="margin-top:10px"><b>小型ゆえの乗っ取りに効く4点：</b></p>
+      <table class="memo-tbl">
+        <tr><td>①議決権なし</td><td>“株”は経済的な応援・分配の権利だけ。<b>経営支配は発起人に固定</b> → 買い占めてもプロジェクトは乗っ取れない＝旨味が消える。</td></tr>
+        <tr><td>②保有上限</td><td>1人（1グループ）の保有割合に上限。本人確認で<b>名寄せ</b>し、複数アカウントの抜け道も封じる。</td></tr>
+        <tr><td>③高くつく曲線</td><td>買い増すほど価格が上がる<b>ボンディングカーブ＋実績アンカー</b>。占有のコストを跳ね上げ、買い圧だけでは動かせない。</td></tr>
+        <tr><td>④規模で流通制限</td><td>一定の時価総額・浮動株・応援者数を満たすまで<b>二次流通させない</b>（IPO前に留める）。東証の上場基準と同じ発想。</td></tr>
+      </table>
+      <p style="margin-top:10px"><b>二次流通を開くときの共通策：</b>ロックアップ、値幅制限・サーキットブレーカー、市場監視AI、発起人・関係者の売買制限＆開示、板の透明化。</p>
+      <p><b>最大の抑止：</b>二次流通は金商法（相場操縦の禁止）の下で運営 → 仕手は“違法”として取り締まれる。<b>①〜④と共通策が揃うまで二次流通は開かない。応援型に留める限り、仕手は成立しない。</b></p>
+    </div>
+
+    <div class="memo-grid">
+      <div class="memo-sec" style="margin:0">
+        <h3>❓ 未決（次に詰める）</h3>
+        <ul class="memo-ul"><li>金銭分配の可否と金商法対応（弁護士）</li><li>資金の預かり方（資金移動業／信託保全 等）</li><li>商標（J-PlatPat）・ドメイン確保</li><li>株価の実績連動・二次流通の設計</li></ul>
+      </div>
+      <div class="memo-sec" style="margin:0">
+        <h3>🚀 次の一手</h3>
+        <ul class="memo-ul"><li>ピッチで壁打ち・仲間集め・専門家相談</li><li>上場講座の告知LP／第一号募集</li><li>プロトタイプの磨き込み</li></ul>
+      </div>
+    </div>
+
+    <div class="memo-sec">
+      <h3>🕓 バージョンログ（プロトタイプ）</h3>
+      <p class="memo-log">v0.1 基本の上場マーケット ／ v0.7 クラファンから取引所へ（審査＋本人確認） ／ v1.0 ネット証券ホーム ／ v1.1 三段審査 ／ v1.2 名称統一 ／ v1.3 二層モデル ／ v1.4 IPO前→上場→流通に再定義 ／ v1.5 個別銘柄ページ ／ v1.7 板売買・チャートホバー ／ v1.8 指値発注・ポートフォリオ整列 ／ <b>v1.9 上場審査＋事業ノートを「メモ」に収納</b>。</p>
+    </div>
+  </section>
+</main>
+
+<!-- ===== 詳細モーダル ===== -->
+<div class="overlay" id="overlay">
+  <div class="modal" style="position:relative" id="modal"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   データ：はじめから上場している6つのプロジェクト。
+   実際のサービスならサーバーから取得しますが、プロトタイプなので
+   メモリ上（この変数の中）にすべて持っています。
+   ========================================================= */
+const PORTFOLIO = {10:5, 7:8};   // 初期保有：パリコレ5株・山フェス8株
+let CASH = 1000000 - (2900*5 + 2200*8);  // 出資済みの分だけ現金を減らす（残 ¥967,900）
+const WATCH = new Set();         // ウォッチした銘柄のid
+
+function hist(base){             // 適当な株価履歴を作るヘルパー
+  const a=[]; let p=base*0.7;
+  for(let i=0;i<24;i++){ p += (Math.random()-0.45)*base*0.06; a.push(Math.max(base*0.4,p)); }
+  a.push(base); return a;
+}
+
+const PROJECTS = [
+  {id:1, name:"あまり食材レスキュー便", tag:"捨てられる食材を、街の食卓へ届ける定期便。", cat:"フード",
+   founder:"山田 彩", price:2480, goal:5000000, raised:3200000, supporters:412, seats:3,
+   desc:"飲食店や農家で余った食材を回収し、サブスク会員へ格安で届けるフードロス解決事業。回収ルートの自動最適化で、廃棄を減らしながら粗利を確保します。既に3都市でテスト運用中。"},
+  {id:2, name:"まちの英語コーチAI", tag:"地方の子どもに、24時間の英会話相手を。", cat:"教育",
+   founder:"Chen Wei", price:1720, goal:4000000, raised:1500000, supporters:238, seats:5,
+   desc:"英語教師が足りない地域向けに、生成AIの英会話コーチを月額提供。学校・自治体と組み、放課後の学習を支えます。パイロット校での継続率は87%。"},
+  {id:3, name:"空き家を宿に変えるSAAS", tag:"眠っている家を、泊まれる資産に。", cat:"地域",
+   founder:"佐藤 健", price:3950, goal:8000000, raised:6100000, supporters:590, seats:2,
+   desc:"空き家オーナーと運営者をつなぎ、民泊化までの許認可・清掃・予約を一気通貫で支援するプラットフォーム。地方創生の補助金とも相性が良く、行政連携が進行中。"},
+  {id:4, name:"1分健康チェック鏡", tag:"鏡を見るだけで、今日の体調がわかる。", cat:"ヘルスケア",
+   founder:"Priya N.", price:5300, goal:12000000, raised:4200000, supporters:301, seats:4,
+   desc:"洗面台のスマートミラーが顔色・むくみ・表情から体調を推定し、生活アドバイスを返すヘルスケアデバイス。保険会社との協業で予防医療市場を狙います。"},
+  {id:5, name:"職人技のマイクロ動画大学", tag:"消えゆく手仕事を、次の世代へ。", cat:"エンタメ",
+   founder:"井上 太一", price:990, goal:3000000, raised:2700000, supporters:844, seats:6,
+   desc:"伝統工芸や町工場の職人技を短尺動画で学べる学習コミュニティ。技能継承と越境ECを組み合わせ、職人の新たな収入源をつくります。"},
+  {id:6, name:"再エネ相乗りマッチング", tag:"屋根を貸す人と、電気が欲しい人を繋ぐ。", cat:"テック",
+   founder:"Marco R.", price:4120, goal:10000000, raised:7800000, supporters:507, seats:1,
+   desc:"太陽光を載せられる屋根の所有者と、再エネ電力を買いたい企業をマッチングするP2Pエネルギー取引基盤。電力小売ライセンスを取得済み。"},
+  {id:7, name:"夜明けの山フェス 2027", tag:"標高1,500mで迎える、日の出とライブ。", cat:"イベント",
+   founder:"実行委員会 峰田", price:2200, goal:8000000, raised:5400000, supporters:1280, seats:8,
+   desc:"廃れかけたスキー場を舞台に、日の出とともにクライマックスを迎える1泊2日の山岳音楽フェス。出資者はチケット優先購入と、来年以降の運営分配を受け取れる。地元自治体・宿泊施設と連携し、オフシーズンの観光需要を創出する。"},
+  {id:8, name:"アニメ『時計塔のヨル』製作委員会", tag:"個人発の物語を、みんなで劇場へ。", cat:"アニメ・作品",
+   founder:"原作 星野ヨル", price:3600, goal:15000000, raised:9200000, supporters:2140, seats:5,
+   desc:"SNSで累計800万いいねを集めた個人制作マンガのアニメ化プロジェクト。出資者はエンドロール掲載・原画・声優オーディション参加権などのリターンを段階的に受け取り、作品の売上に応じて分配を得る。制作スタジオ内定済み。"},
+  {id:9, name:"まわるビーガン食堂トラック", tag:"肉なしでも、また食べたくなる一台を街へ。", cat:"フード",
+   founder:"シェフ 大槻 実", price:1350, goal:4500000, raised:1900000, supporters:426, seats:4,
+   desc:"完全植物性のバーガーとカレーを出す移動式フードトラック。出資で車両とキッチンを整備し、フェス・オフィス街・地方イベントを巡回。売上と出店数に連動して出資者にリターンを還元し、2台目・3台目へと「のれん分け」を広げる。"},
+  {id:10, name:"パリコレ出展への挑戦｜MITSUKI", tag:"日本の若手デザイナーが、2年でパリの舞台へ。", cat:"ファッション",
+   founder:"デザイナー 三月みつき", price:2900, goal:6000000, raised:2350000, supporters:678, seats:6,
+   desc:"独学の若手デザイナーが2年後のパリ・ファッションウィーク出展を目指す個人プロジェクト。出資で生地・パタンナー・渡航費を賄い、出資者には限定コレクションの先行購入権と、成功時のブランド分配を用意。制作過程はすべて公開し、「応援するほど株価が上がる」を体現する。"},
+  {id:11, name:"深海の発光生物ゲノム解読", tag:"予算の谷に落ちた研究に、市民のお金を。", cat:"研究",
+   founder:"海洋生物学者 若林 蓮", price:1800, goal:7000000, raised:3050000, supporters:934, seats:4,
+   desc:"公的助成の狭間で止まっていた、深海発光生物のゲノム解読プロジェクト。出資者は論文の謝辞掲載・研究進捗レポート・成果の産業応用時の分配を受け取る。学術の成果を「応援できる資産」に変え、基礎研究の新しい資金調達モデルを示す。"},
+  {id:12, name:"未踏峰カルジャンへの初登頂", tag:"まだ誰も立っていない頂に、日本隊で。", cat:"挑戦",
+   founder:"登山家 三宅 岳人", price:2650, goal:9000000, raised:6700000, supporters:1520, seats:2,
+   desc:"ヒマラヤの未踏峰カルジャン(仮称・6,800m)への初登頂を目指す遠征プロジェクト。出資で装備・入山料・シェルパ雇用を賄い、出資者には現地からの生配信・登頂記ドキュメンタリー・ギア命名権などのリターンを用意。挑戦の一部始終を株価の上下として可視化する。"},
+  {id:13, name:"絵本『よるのパンやさん』を本にする", tag:"眠れない夜の子に届けたい、一冊の絵本。", cat:"出版",
+   founder:"作家 東 ひかり", price:1100, goal:2500000, raised:1650000, supporters:1130, seats:5,
+   desc:"SNSで読み聞かせ動画が広がった絵本を、出資で製本・印刷・流通まで実現する書籍化プロジェクト。出資者は初版へのお名前掲載・サイン本・重版時の印税分配を受け取る。売れるほど株価と分配が伸び、作家と読者が一緒に「育てる出版」を体現。小説の書籍化にも同じ仕組みが使える。"},
+  {id:15, name:"個人開発SaaS『請求書ロボ』", tag:"ひとり社長の事務作業を、丸ごと自動化。", cat:"IT",
+   founder:"インディー開発者 蒼井 港", price:2100, goal:5000000, raised:2900000, supporters:560, seats:4,
+   desc:"フリーランス・零細事業者向けに、見積〜請求〜入金確認を全自動化するオープンソースSaaS。出資で開発を加速し、出資者は有料プランの先行利用・機能リクエスト優先権・売上分配(レベニューシェア)を得る。MRR(月次収益)が株価に反映され、「伸びるほど報われる個人開発」の新モデルを示す。"},
+  {id:16, name:"続く人だけのダイエットアプリ『三日坊主ゼロ』", tag:"挫折させない設計で、続く人だけを増やす。", cat:"ヘルスケア",
+   founder:"開発者 木下 なつ", price:1900, goal:5000000, raised:2400000, supporters:610, seats:5,
+   desc:"行動科学に基づき「続けられること」だけに全振りしたダイエットアプリ。継続率が売上の生命線なので、出資者は月次の継続率と課金者数(=株価)の伸びを見ながら応援・分配を受け取る。"},
+  {id:18, name:"間借りから始めるコーヒーショップ", tag:"1坪の間借りから、街の一等地へ。", cat:"フード",
+   founder:"バリスタ 湊 一颯", price:1200, goal:3500000, raised:2050000, supporters:520, seats:6,
+   desc:"間借り営業→固定店舗→多店舗、と段階的に育てるスペシャルティコーヒー店。出資者は生涯無料券・株主限定豆・売上分配を受け取り、出店が進むほど株価が上がる。"},
+  {id:19, name:"荷物も坂も気にしない次世代サイクル『MULE』", tag:"買い物も子どもも運べる、電動三輪。", cat:"テック",
+   founder:"プロダクト設計 大石 岳", price:3100, goal:12000000, raised:5600000, supporters:740, seats:3,
+   desc:"重い荷物と急坂に強い電動アシスト三輪自転車のハードウェア開発。出資者は量産第一号の優先購入権と、販売台数に応じた分配を得る。試作機は公道テスト済み。"},
+  {id:20, name:"耕さない畑『不耕起・有機ファーム』", tag:"土を耕さず、生態系ごと育てる農業へ。", cat:"農業",
+   founder:"就農者 田淵 穣", price:1600, goal:6000000, raised:2200000, supporters:490, seats:5,
+   desc:"不耕起・無農薬の有機農法で、土壌の炭素を増やしながら野菜を育てる農園。出資者はCSA(会員制)野菜ボックスと収穫連動の分配を受け取る。環境価値(カーボン)の証券化も視野。"},
+  {id:21, name:"AIを「使いこなす側」に育てる学習塾", tag:"AIに使われず、AIを操る子を育てる。", cat:"教育",
+   founder:"塾長 二階堂 玲", price:2000, goal:5500000, raised:3100000, supporters:970, seats:4,
+   desc:"生成AIを前提に、問いを立てる力・検証する力を教える小中学生向け学習塾。オンライン+教室のハイブリッドで全国展開を狙い、出資者は教室のフランチャイズ収益分配を受け取る。"},
+  {id:22, name:"片手でたためるベビーカー『ふわり』", tag:"抱っこしたまま、片手で。親のための一台。", cat:"福祉",
+   founder:"プロダクト設計 保科 めい", price:2600, goal:8000000, raised:3400000, supporters:820, seats:4,
+   desc:"子どもを抱いたままでも片手で開閉できるベビーカーのハードウェア開発。当事者100人の声を設計に反映し、出資者は初回ロットの優先購入権と販売台数連動の分配を得る。試作は保育現場でテスト中。"},
+  {id:23, name:"段差を越える電動車椅子『Stair-Free』", tag:"あきらめていた段差を、自分の力で越える。", cat:"福祉",
+   founder:"福祉工学 遠山 慧", price:3400, goal:14000000, raised:6200000, supporters:1340, seats:3,
+   desc:"数cmの段差や砂利道でも安定して進む次世代電動車椅子。当事者・介助者と共同開発し、出資者は量産支援のリターンと、公共施設への導入が進むほどの収益分配を受け取る。福祉機器の認証取得を準備中。"},
+  {id:24, name:"若手が挑む、現代の能舞台『新作能プロジェクト』", tag:"600年の型に、いまの物語をのせる。", cat:"伝統",
+   founder:"能楽師 観世 流之介", price:1900, goal:6000000, raised:3900000, supporters:1580, seats:5,
+   desc:"若手能楽師が現代の題材で新作能を書き下ろし、公演として上演するプロジェクト。出資者は正面席・面や装束の間近見学・映像アーカイブへのアクセスを受け取る。伝統芸能を「支えて残す」だけでなく、育てて世界へ届ける挑戦。"},
+  {id:25, name:"町の鍛冶場を継ぐ『最後の弟子』基金", tag:"あと一人いれば、その技は途切れない。", cat:"伝統",
+   founder:"継承支援 桐生 灯", price:1500, goal:5000000, raised:2100000, supporters:940, seats:6,
+   desc:"廃業寸前の職人に弟子を1人つけ、生活費と修業期間を出資でまかなう技能継承基金。出資者は継承された道具・作品の優先購入権と、弟子が独立後にあげる売上からの分配を受け取る。消えかけた技を「資産」として未来に引き継ぐ。"},
+  {id:26, name:"若手作家、初めての個展『余白の色』", tag:"まだ無名の絵に、最初の目を。", cat:"アート",
+   founder:"現代アーティスト 白石 慧", price:1800, goal:4000000, raised:1600000, supporters:430, seats:5,
+   desc:"ギャラリー未所属の若手画家が、初めての個展を開くプロジェクト。出資で会場・額装・図録を用意し、出資者は在廊招待・限定図録・小作品の優先購入権や売約時の分配を受け取る。売れるほど評価（株価）が上がり、まだ無名の作家の価値が市場で可視化されていく。"},
+  {id:27, name:"みんなで育てる共同アトリエ『色部屋』", tag:"食えない時代を、みんなで越える制作拠点。", cat:"アート",
+   founder:"アートコレクティブ主宰 南 千尋", price:1500, goal:6000000, raised:2600000, supporters:720, seats:6,
+   desc:"若手作家がシェアで使える共同アトリエ＆発表スペースを運営するプロジェクト。出資者は展示の優先案内・所属作家の作品優先購入・売上分配を受け取る。作家が育ち作品が売れるほど価値が伸びる、アートの継続銘柄。"},
+];
+PROJECTS.forEach(p=>{ p.h = hist(p.price); p.prev = p.h[p.h.length-2]; });
+
+/* 銘柄タイプ：単発(=満期があり、達成したら償還して上場廃止) と 継続(=毎シーズン取引される)。
+   単発プロジェクトのidと満期日をここで指定します。ここに無いものは継続扱い。 */
+const ONEOFF = {7:"2027-07-18", 8:"2027-12-01", 10:"2028-03-01", 11:"2027-03-31", 12:"2027-05-15", 24:"2026-11-30", 26:"2027-02-20"};
+PROJECTS.forEach(p=>{ p.oneoff = !!ONEOFF[p.id]; p.deadline = ONEOFF[p.id] || null; });
+
+// 満期までの残り日数（単発のみ）
+function daysLeft(dateStr){ return Math.max(0, Math.ceil((new Date(dateStr) - new Date()) / 86400000)); }
+function fmtDate(dateStr){ const d=new Date(dateStr); return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}`; }
+// タイプのバッジHTML
+function typeBadge(p){ return p.oneoff
+  ? `<span class="badge once">単発 · 満期あり</span>`
+  : `<span class="badge cont">継続</span>`; }
+
+/* リターンのモード：投資型（=実績を出して“昇格上場”し、金銭で分配する銘柄）と
+   応援型（=体験・権利・優待の非金銭リターン）。ここに無いものは応援型。 */
+const TOSHI = new Set([6,9,15,16,18]);
+PROJECTS.forEach(p=>{ p.toshi = TOSHI.has(p.id); });
+function modeBadge(p){ return p.toshi
+  ? `<span class="badge toshi">上場 · 配当あり</span>`
+  : `<span class="badge ouen">IPO前 · 未上場</span>`; }
+
+/* =========================================================
+   画面の切り替え（マーケット / ポートフォリオ / 上場申請）
+   ========================================================= */
+const views = ["market","portfolio","ipo","memo"];
+document.querySelectorAll("nav button").forEach(b=>{
+  b.onclick=()=>show(b.dataset.view);
+});
+function show(v){
+  views.forEach(x=>{
+    document.getElementById("view-"+x).classList.toggle("hidden", x!==v);
+    const btn=document.querySelector(`nav button[data-view="${x}"]`);
+    if(btn) btn.classList.toggle("active", x===v);
+  });
+  // 上場審査はメモに収納 → メモタブをアクティブ表示に
+  if(v==="ipo"){ const mb=document.querySelector('nav button[data-view="memo"]'); if(mb) mb.classList.add("active"); }
+  if(v==="portfolio") renderPortfolio();
+  window.scrollTo(0,0);
+}
+
+/* =========================================================
+   小さな折れ線グラフ（SVGスパークライン）を文字列で生成
+   ========================================================= */
+function spark(data,w,h,color){
+  const min=Math.min(...data), max=Math.max(...data), r=max-min||1;
+  const pts=data.map((v,i)=>`${(i/(data.length-1))*w},${h-((v-min)/r)*h}`).join(" ");
+  const area=`0,${h} ${pts} ${w},${h}`;
+  const id="g"+Math.random().toString(36).slice(2,7);
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${color}" stop-opacity=".35"/>
+      <stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    <polygon points="${area}" fill="url(#${id})"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+/* =========================================================
+   マーケット一覧の描画
+   ========================================================= */
+let activeCat="すべて", query="", activeType="すべて";
+const cats=["すべて",...new Set(PROJECTS.map(p=>p.cat))];
+const catsEl=document.getElementById("cats");
+cats.forEach(c=>{
+  const b=document.createElement("button");
+  b.className="chip"+(c===activeCat?" active":"");
+  b.textContent=c; b.onclick=()=>{activeCat=c;[...catsEl.children].forEach(x=>x.classList.remove("active"));b.classList.add("active");renderGrid();};
+  catsEl.appendChild(b);
+});
+
+// 銘柄タイプの絞り込み（すべて / 継続 / 単発）
+const typesEl=document.getElementById("types");
+["すべて","継続","単発"].forEach(t=>{
+  const b=document.createElement("button");
+  b.className="chip type"+(t===activeType?" active":"");
+  b.textContent=t; b.onclick=()=>{activeType=t;[...typesEl.children].forEach(x=>x.classList.remove("active"));b.classList.add("active");renderGrid();};
+  typesEl.appendChild(b);
+});
+document.getElementById("q").oninput=e=>{query=e.target.value.trim();renderGrid();};
+
+function yen(n){return "¥"+Math.round(n).toLocaleString("ja-JP");}
+
+/* 口座サマリー（総資産・評価損益・現金・保有銘柄数）を更新 */
+function renderAccount(){
+  let value=0,hold=0;
+  Object.keys(PORTFOLIO).forEach(id=>{ if(PORTFOLIO[id]>0){ const p=PROJECTS.find(x=>x.id==id); if(p){ value+=p.price*PORTFOLIO[id]; hold++; } } });
+  const cost=value*0.92, total=CASH+value, pl=value-cost;
+  document.getElementById("acc-total").textContent=yen(total);
+  document.getElementById("acc-cash").textContent=yen(CASH);
+  document.getElementById("acc-hold").textContent=hold+"銘柄";
+  const el=document.getElementById("acc-pl");
+  el.textContent=(pl>=0?"+":"−")+yen(Math.abs(pl));
+  el.className=pl>=0?"up":"down";
+}
+
+/* ウォッチの追加/解除 */
+function toggleWatch(id){
+  if(WATCH.has(id)) WATCH.delete(id); else WATCH.add(id);
+  renderGrid(); if(rankMode==="ウォッチ") renderRanking();
+}
+
+/* ランキング（ネット証券のトップにある順位表）*/
+let rankMode="値上がり率";
+const rankTabsEl=document.getElementById("rank-tabs");
+["値上がり率","応援数","満期間近","ウォッチ"].forEach(t=>{
+  const b=document.createElement("button");
+  b.className=(t===rankMode?"active":""); b.textContent=t;
+  b.onclick=()=>{rankMode=t;[...rankTabsEl.children].forEach(x=>x.classList.remove("active"));b.classList.add("active");renderRanking();};
+  rankTabsEl.appendChild(b);
+});
+function renderRanking(){
+  const el=document.getElementById("ranking");
+  let list=[...PROJECTS];
+  if(rankMode==="値上がり率") list.sort((a,b)=>((b.price-b.prev)/b.prev)-((a.price-a.prev)/a.prev));
+  else if(rankMode==="応援数") list.sort((a,b)=>b.supporters-a.supporters);
+  else if(rankMode==="満期間近") list=list.filter(p=>p.oneoff).sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
+  else if(rankMode==="ウォッチ") list=list.filter(p=>WATCH.has(p.id));
+  list=list.slice(0,6);
+  if(list.length===0){ el.innerHTML=`<div class="rk-empty">${rankMode==="ウォッチ"?"カードの★でウォッチした銘柄が、ここに並びます。":"該当する銘柄がありません。"}</div>`; return; }
+  el.innerHTML=list.map((p,i)=>{
+    const d=((p.price-p.prev)/p.prev*100),up=d>=0;
+    const sub = rankMode==="満期間近" ? `満期まであと${daysLeft(p.deadline)}日`
+              : rankMode==="応援数" ? `応援 ${p.supporters}人` : p.cat;
+    return `<div class="rk" onclick="openModal(${p.id})">
+      <div class="pos ${i<3?'top':''}">${i+1}</div>
+      <div class="rkname"><b>${p.name}</b><span>${sub}</span></div>
+      <div class="rkprice"><b>${yen(p.price)}</b><div class="delta ${up?'u':'d'}">${up?'▲':'▼'}${Math.abs(d).toFixed(1)}%</div></div>
+    </div>`;
+  }).join("");
+}
+
+function renderGrid(){
+  const grid=document.getElementById("grid");
+  const list=PROJECTS.filter(p=>
+    (activeCat==="すべて"||p.cat===activeCat) &&
+    (activeType==="すべて"||(activeType==="単発"?p.oneoff:!p.oneoff)) &&
+    (query===""||(p.name+p.tag+p.desc).toLowerCase().includes(query.toLowerCase()))
+  );
+  grid.innerHTML = list.map(p=>{
+    const d=((p.price-p.prev)/p.prev*100);
+    const up=d>=0;
+    const lastMeta = p.oneoff
+      ? `<div>満期 <b>${fmtDate(p.deadline)}</b>（あと${daysLeft(p.deadline)}日）</div>`
+      : `<div>参画枠 <b>${p.seats}</b></div>`;
+    return `<div class="card" onclick="openModal(${p.id})">
+      <button class="star ${WATCH.has(p.id)?'on':''}" onclick="event.stopPropagation();toggleWatch(${p.id})" title="ウォッチ">${WATCH.has(p.id)?'★':'☆'}</button>
+      <div class="cat">${p.cat}${modeBadge(p)}${typeBadge(p)}</div>
+      <h3>${p.name}</h3>
+      <div class="tag">${p.tag}</div>
+      <div class="row">
+        <div class="price">${yen(p.price)}<small>/株</small></div>
+        <div class="delta ${up?'u':'d'}">${up?'▲':'▼'} ${Math.abs(d).toFixed(2)}%</div>
+      </div>
+      <div class="meta">
+        <div>時価総額 <b>${yen(p.price* shares(p))}</b></div>
+        <div>応援 <b>${p.supporters}人</b></div>
+        ${lastMeta}
+      </div>
+      <div class="spark">${spark(p.h.slice(-16),120,44,up?'#2ec26b':'#ff5d6c')}</div>
+    </div>`;
+  }).join("") || `<div class="empty">該当するプロジェクトがありません。</div>`;
+}
+// 発行済み株数の目安（調達目標 ÷ 初値）
+function shares(p){ return Math.round(p.goal/p.h[0]); }
+
+/* =========================================================
+   個別銘柄ページ（チャート・板・進捗レポート）
+   ========================================================= */
+let stockTab="チャート", stockTF="1月";
+// 注文伝票（指値）の状態
+let orderStockId=null, orderSide="buy", orderQty=1, orderPx=null;
+
+// 決定的な擬似乱数（同じ銘柄なら毎回同じ形になるように）
+function seeded(seed){ return function(){ seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+
+// 時間軸ごとの株価シリーズ（終点は必ず現在値）
+const TF_N={ "1日":24, "1週":28, "1月":30 };
+function genSeries(p,n,tfSeed){
+  const rnd=seeded((p.id%100000)*7 + tfSeed);
+  const raw=[]; let x=0;
+  for(let i=0;i<n;i++){ x+=rnd()-0.5; raw.push(x); }
+  const last=raw[n-1], mn=Math.min(...raw), mx=Math.max(...raw), spread=(mx-mn)||1;
+  const amp=p.price*0.26;
+  return raw.map(v=> Math.max(1, Math.round(p.price + (v-last)/spread*amp)) );
+}
+function seriesFor(p,k){
+  if(k==="全") return (p.h && p.h.length>2) ? p.h : genSeries(p,30,0);
+  return genSeries(p, TF_N[k], {"1日":11,"1週":22,"1月":33}[k]);
+}
+
+// リッチな株価チャート（グリッド・基準線・終点ドット・ホバー数値）
+let CHART=null;
+function bigChart(data,color){
+  const W=660,H=180,padL=46,padR=10,padT=10,padB=8;
+  const iw=W-padL-padR, ih=H-padT-padB;
+  const mn=Math.min(...data),mx=Math.max(...data),r=(mx-mn)||1;
+  const X=i=> padL + (i/(data.length-1))*iw;
+  const Y=v=> padT + ih - ((v-mn)/r)*ih;
+  const pts=data.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+  const area=`${padL},${(padT+ih).toFixed(1)} ${pts} ${(padL+iw).toFixed(1)},${(padT+ih).toFixed(1)}`;
+  const uid=Math.random().toString(36).slice(2,7), gid="cg"+uid, sid="cs"+uid;
+  const grid=[0,0.5,1].map(t=>{ const y=padT+ih*t, val=mx-r*t;
+    return `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${padL+iw}" y2="${y.toFixed(1)}" stroke="var(--line)"/><text x="${padL-6}" y="${(y+3).toFixed(1)}" text-anchor="end" fill="var(--muted)" font-size="10">${yen(Math.round(val))}</text>`;
+  }).join("");
+  const baseY=Y(data[0]).toFixed(1);
+  const lx=X(data.length-1).toFixed(1), ly=Y(data[data.length-1]).toFixed(1);
+  CHART={svgId:sid,data,padL,iw,padT,ih,W,min:mn,range:r,color};
+  return `<svg id="${sid}" class="bchart" viewBox="0 0 ${W} ${H}" onmousemove="chartHover(event)" onmouseleave="chartLeave()">
+    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".33"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}
+    <line x1="${padL}" y1="${baseY}" x2="${padL+iw}" y2="${baseY}" stroke="var(--muted)" stroke-dasharray="3 3" opacity=".5"/>
+    <polygon points="${area}" fill="url(#${gid})"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="${lx}" cy="${ly}" r="3.5" fill="${color}"/>
+    <line id="cx-line" x1="0" y1="${padT}" x2="0" y2="${padT+ih}" stroke="var(--text)" stroke-width="1" opacity="0"/>
+    <circle id="cx-dot" r="4" fill="${color}" stroke="var(--panel)" stroke-width="1.5" opacity="0"/>
+  </svg>`;
+}
+// チャートのホバー：最寄りのデータ点の株価をクロスヘアとツールチップで表示
+function chartHover(e){
+  const c=CHART; if(!c) return;
+  const svg=document.getElementById(c.svgId); if(!svg) return;
+  const rect=svg.getBoundingClientRect();
+  const x0=c.padL/c.W, x1=(c.padL+c.iw)/c.W;
+  let pr=((e.clientX-rect.left)/rect.width - x0)/(x1-x0);
+  pr=Math.max(0,Math.min(1,pr));
+  const idx=Math.round(pr*(c.data.length-1)), val=c.data[idx];
+  const X=c.padL + (idx/(c.data.length-1))*c.iw;
+  const Y=c.padT + c.ih - ((val-c.min)/c.range)*c.ih;
+  const line=document.getElementById("cx-line"), dot=document.getElementById("cx-dot"), tip=document.getElementById("cx-tip");
+  if(line){ line.setAttribute("x1",X); line.setAttribute("x2",X); line.style.opacity=".6"; }
+  if(dot){ dot.setAttribute("cx",X); dot.setAttribute("cy",Y); dot.style.opacity="1"; }
+  if(tip){ const wrap=tip.parentElement.getBoundingClientRect();
+    tip.textContent=yen(val); tip.style.opacity="1";
+    tip.style.left=Math.max(24,Math.min(wrap.width-24, e.clientX-wrap.left))+"px"; }
+}
+function chartLeave(){ ["cx-line","cx-dot","cx-tip"].forEach(id=>{const el=document.getElementById(id); if(el) el.style.opacity="0";}); }
+
+// 板（気配）：現在値をはさんで、売り（手放したい）と買い（応援したい）
+function orderBook(p){
+  const P=p.price, rnd=seeded(p.id*13+7), levels=[];
+  for(let i=3;i>=1;i--) levels.push({px:Math.round(P*(1+0.01*i)), side:"sell", q:20+Math.round(rnd()*180)});
+  levels.push({px:P, cur:true});
+  for(let i=1;i<=3;i++) levels.push({px:Math.round(P*(1-0.01*i)), side:"buy", q:20+Math.round(rnd()*180)});
+  const maxq=Math.max(...levels.filter(l=>l.q).map(l=>l.q));
+  const rows=levels.map(l=>{
+    if(l.cur) return `<div class="obrow cur"><div class="q"></div><div class="px" style="color:var(--brand)">${yen(l.px)}</div><div class="q"></div></div>`;
+    if(l.side==="sell") return `<div class="obrow act" onclick="setOrderQuote(${p.id},'buy',${l.px})" title="${yen(l.px)}を買い指値に入れる"><div class="q sell"><span class="bar sell" style="width:${(l.q/maxq*100).toFixed(0)}%"></span><span class="qv">${l.q}</span></div><div class="px">${yen(l.px)}</div><div class="q hint g">買い指値 ▸</div></div>`;
+    return `<div class="obrow act" onclick="setOrderQuote(${p.id},'sell',${l.px})" title="${yen(l.px)}を売り指値に入れる"><div class="q hint r">◂ 売り指値</div><div class="px">${yen(l.px)}</div><div class="q buy"><span class="bar buy" style="width:${(l.q/maxq*100).toFixed(0)}%"></span><span class="qv">${l.q}</span></div></div>`;
+  }).join("");
+  return `<div class="obhead"><div>売り（手放したい）</div><div style="text-align:center">気配値</div><div style="text-align:right">買い（応援したい）</div></div>
+    <div class="ob">${rows}</div>
+    <div class="obnote">気配値をタップすると、その価格が下の<b style="color:var(--text)">注文伝票の指値</b>に入ります。数量を決めて<b style="color:var(--text)">発注</b>すると約定します（指値注文のイメージ）。買いが厚いほど、次に株価が上がりやすい。</div>
+    ${orderTicket(p)}`;
+}
+
+// 注文伝票（指値・数量・売買）
+function orderTicket(p){
+  const held=PORTFOLIO[p.id]||0;
+  const est=orderPx*orderQty;
+  const buy=orderSide==="buy";
+  return `<div class="ticket">
+    <div class="tk-side">
+      <button class="${buy?'active buy':''}" onclick="setOrderSide(${p.id},'buy')">買い（応援）</button>
+      <button class="${!buy?'active sell':''}" onclick="setOrderSide(${p.id},'sell')">売り（手放す）</button>
+    </div>
+    <div class="tk-grid">
+      <div class="tk-field"><label>数量（株）</label><div class="step"><button onclick="stepQty(${p.id},-1)">−</button><span>${orderQty}</span><button onclick="stepQty(${p.id},1)">＋</button></div></div>
+      <div class="tk-field"><label>指値（1株）</label><div class="step"><button onclick="stepPx(${p.id},-1)">−</button><span>${yen(orderPx)}</span><button onclick="stepPx(${p.id},1)">＋</button></div></div>
+    </div>
+    <div class="tk-sum"><span>${buy?'必要現金（概算）':'受取額（概算）'}</span><b>${yen(est)}</b></div>
+    <div class="tk-meta">現在値 ${yen(p.price)}　·　保有 ${held}株　·　現金 ${yen(CASH)}</div>
+    <button class="tk-go ${buy?'buy':'sell'}" onclick="placeOrder(${p.id})">${buy?'買い注文を発注する':'売り注文を発注する'}</button>
+  </div>`;
+}
+function setOrderQuote(id,side,px){ orderStockId=id; orderSide=side; orderPx=px; openModal(id); }
+function setOrderSide(id,s){ orderSide=s; openModal(id); }
+function stepQty(id,d){ orderQty=Math.max(1, orderQty+d); openModal(id); }
+function stepPx(id,d){ const step=Math.max(1,Math.round(orderPx*0.01)); orderPx=Math.max(1, orderPx + d*step); openModal(id); }
+
+// 発注 → 約定
+function placeOrder(id){
+  const p=PROJECTS.find(x=>x.id===id), qty=orderQty, px=orderPx;
+  if(orderSide==="buy"){
+    const cost=px*qty;
+    if(cost>CASH){ toast("残高が足りません 💸"); return; }
+    CASH-=cost; PORTFOLIO[id]=(PORTFOLIO[id]||0)+qty; p.supporters+=1;
+    p.prev=p.price; p.price=Math.max(px, Math.round(p.price*(1+0.004*qty))); p.h.push(p.price);
+    toast(`約定：${qty}株を ${yen(px)} で買い（応援）🎉`);
+  } else {
+    const held=PORTFOLIO[id]||0;
+    if(qty>held){ toast("保有数を超えています"); return; }
+    CASH+=px*qty; PORTFOLIO[id]-=qty;
+    p.prev=p.price; p.price=Math.min(px, Math.round(p.price*(1-0.004*qty))); p.h.push(p.price);
+    toast(`約定：${qty}株を ${yen(px)} で売り`);
+  }
+  updateCash(); renderGrid(); renderAccount(); renderRanking(); openModal(id);
+}
+
+// 進捗レポート（実績KPI・マイルストーン・発起人の更新）
+function progressReport(p){
+  const pct=Math.min(100,Math.round(p.raised/p.goal*100)), rnd=seeded(p.id*3+1);
+  const growth=5+Math.round(rnd()*40);
+  const kpi3 = p.toshi
+    ? `<div class="kpi"><div class="k">想定分配利回り</div><div class="v">${(3+rnd()*7).toFixed(1)}%</div><div class="s">年率(目安)</div></div>`
+    : `<div class="kpi"><div class="k">ステータス</div><div class="v" style="font-size:15px">実績づくり中</div><div class="s">IPOは実績次第</div></div>`;
+  const kpis=`<div class="kpis">
+    <div class="kpi"><div class="k">目標達成率</div><div class="v">${pct}%</div><div class="s">${yen(p.raised)}</div></div>
+    <div class="kpi"><div class="k">直近30日</div><div class="v" style="color:var(--up)">+${growth}%</div><div class="s">評価の伸び</div></div>
+    ${kpi3}</div>`;
+  const steps=["構想・チーム組成","プロトタイプ・試作","IPO前マーケットに公開","実績づくり（KPI達成）","IPO（本上場・配当解禁）"];
+  const doneCount = p.toshi ? 5 : (pct>=66?4:3);
+  const mstone=`<div class="mstone">`+steps.map((s,i)=>{
+    const cls=i<doneCount-1?"done":(i===doneCount-1?"now":"");
+    const note=i<doneCount-1?"完了":(i===doneCount-1?"進行中":"これから");
+    return `<div class="mrow ${cls}"><div class="dot"></div><div class="mt">${s}<small>${note}</small></div></div>`;
+  }).join("")+`</div>`;
+  const dA=fmtDate(new Date(Date.now()-6*86400000).toISOString().slice(0,10));
+  const dB=fmtDate(new Date(Date.now()-20*86400000).toISOString().slice(0,10));
+  const updates=`
+    <div class="upd"><div class="ut">${dA} · 発起人より</div><div class="um">${p.founder}です。応援ありがとうございます。おかげさまで${p.supporters}人に応援いただき、次のマイルストーンに向けて動いています。</div></div>
+    <div class="upd"><div class="ut">${dB} · 発起人より</div><div class="um">「${p.tag}」——このビジョンを形にすべく、試作と検証を重ねています。進捗はここで随時ご報告します。</div></div>`;
+  return `<h3 style="font-size:13px;margin:2px 0 8px;color:var(--muted);font-weight:700">実績・KPI</h3>${kpis}
+    <h3 style="font-size:13px;margin:6px 0 4px;color:var(--muted);font-weight:700">マイルストーン</h3>${mstone}
+    <h3 style="font-size:13px;margin:6px 0 8px;color:var(--muted);font-weight:700">発起人からの更新</h3>${updates}
+    <p class="desc" style="margin-top:12px">${p.desc}</p>`;
+}
+
+// タブ本体
+function stockBody(p,col,up,held){
+  if(stockTab==="板") return orderBook(p);
+  if(stockTab==="進捗レポート") return progressReport(p);
+  // チャート
+  const tfs=["1日","1週","1月","全"].map(k=>`<button class="${k===stockTF?'active':''}" onclick="setTF(${p.id},'${k}')">${k}</button>`).join("");
+  const stats=`<div class="stats">
+    <div class="stat"><div class="k">時価総額</div><div class="v">${yen(p.price*shares(p))}</div></div>
+    <div class="stat"><div class="k">発行株数</div><div class="v">${shares(p).toLocaleString()}</div></div>
+    ${p.oneoff
+      ? `<div class="stat"><div class="k">満期まで</div><div class="v">${daysLeft(p.deadline)}日</div></div>`
+      : `<div class="stat"><div class="k">参画枠</div><div class="v">${p.seats}</div></div>`}
+    <div class="stat"><div class="k">保有株数</div><div class="v">${held}</div></div></div>`;
+  const maturity = p.oneoff ? `<div class="maturity" style="margin-top:14px">🎯 <b>単発</b>　満期 ${fmtDate(p.deadline)}（あと${daysLeft(p.deadline)}日）で目標達成すると償還・上場廃止。</div>` : ``;
+  const prog=`<div style="margin:16px 0 4px;font-size:13px;color:var(--muted)">調達状況　<b style="color:var(--text)">${yen(p.raised)}</b> / ${yen(p.goal)}（${Math.round(p.raised/p.goal*100)}%）</div>
+    <div class="progress"><span style="width:${Math.min(100,p.raised/p.goal*100)}%"></span></div>`;
+  return `<div class="chart-wrap"><div class="tfbar">${tfs}</div>${bigChart(seriesFor(p,stockTF),col)}<div id="cx-tip" class="cxtip"></div></div>${stats}${maturity}${prog}`;
+}
+function setStockTab(id,t){ stockTab=t; openModal(id); }
+function setTF(id,k){ stockTF=k; openModal(id); }
+
+/* =========================================================
+   詳細モーダル
+   ========================================================= */
+const overlay=document.getElementById("overlay");
+const modal=document.getElementById("modal");
+overlay.onclick=e=>{ if(e.target===overlay) overlay.classList.remove("open"); };
+
+function openModal(id){
+  const p=PROJECTS.find(x=>x.id===id);
+  const d=((p.price-p.prev)/p.prev*100), up=d>=0;
+  const held=PORTFOLIO[id]||0;
+  // 別の銘柄を開いたら注文伝票をリセット
+  if(orderStockId!==id){ orderStockId=id; orderSide="buy"; orderQty=1; orderPx=p.price; }
+  modal.innerHTML=`
+    <button class="close" onclick="document.getElementById('overlay').classList.remove('open')">×</button>
+    <div class="modal-head">
+      <div>
+        <div class="cat" style="color:var(--brand);font-weight:800;font-size:11px;letter-spacing:.08em">${p.cat}${modeBadge(p)}${typeBadge(p)}</div>
+        <h2>${p.name}</h2>
+        <div class="founder">発起人：${p.founder}　·　応援 ${p.supporters}人</div>
+      </div>
+      <div class="bigprice">
+        <div class="p">${yen(p.price)}</div>
+        <div class="delta ${up?'u':'d'}" style="display:inline-block">${up?'▲':'▼'} ${Math.abs(d).toFixed(2)}%</div>
+      </div>
+    </div>
+    <div class="stabs">${["チャート","板","進捗レポート"].map(t=>`<button class="${t===stockTab?'active':''}" onclick="setStockTab(${p.id},'${t}')">${t}</button>`).join("")}</div>
+    <div id="stock-body">${stockBody(p,up?'#2ec26b':'#ff5d6c',up,held)}</div>
+    ${p.toshi
+      ? `<div class="riskbox">📈 <b>上場銘柄（IPO済）</b>　IPO（本上場）を果たした銘柄です。売上・利益から<b>金銭で配当・分配</b>される代わりに、株価は上下し<b>元本割れ</b>することもあり、将来は<b>二次流通</b>で売買も。（本番では第二種金融商品取引業の登録とリスク説明が必要）</div>`
+      : `<div class="ouenbox">🌱 <b>IPO前マーケット（未上場）</b>　まだ上場前の挑戦を、いち早く応援できる“未公開株”の立場です。今のリターンは<b>体験・権利・優待</b>ですが、実績を出せば<b>IPO（本上場）</b>して配当が解禁。株価が下がっても受け取れるお礼は目減りしません。</div>`}
+    <div class="actions">
+      <button class="btn" onclick="invest(${p.id},1)">＋1株 出資 (${yen(p.price)})</button>
+      <button class="btn" onclick="invest(${p.id},10)">＋10株 まとめ出資</button>
+      <button class="btn ghost" onclick="join(${p.id})">🙌 参画を申し込む</button>
+    </div>`;
+  overlay.classList.add("open");
+}
+
+/* =========================================================
+   出資する：株を買うと株価が少し上がる（需要で上がるイメージ）
+   ========================================================= */
+function invest(id,qty){
+  const p=PROJECTS.find(x=>x.id===id);
+  const cost=p.price*qty;
+  if(cost>CASH){ toast("残高が足りません 💸"); return; }
+  CASH-=cost;
+  PORTFOLIO[id]=(PORTFOLIO[id]||0)+qty;
+  p.prev=p.price;
+  p.price=Math.round(p.price*(1+0.012*qty));  // 買われるほど上昇
+  p.raised+=cost; p.supporters+=1; p.h.push(p.price);
+  updateCash(); renderGrid(); renderAccount(); renderRanking(); openModal(id);
+  toast(`${p.name} に ${qty}株 出資しました 🎉`);
+}
+
+/* 参画する：残り枠を1つ埋める */
+function join(id){
+  const p=PROJECTS.find(x=>x.id===id);
+  if(p.seats<=0){ toast("参画枠は満席です"); return; }
+  p.seats-=1; p.supporters+=1; p.prev=p.price; p.price=Math.round(p.price*1.03); p.h.push(p.price);
+  renderGrid(); renderRanking(); openModal(id);
+  toast(`${p.name} への参画を申し込みました 🙌`);
+}
+
+/* =========================================================
+   ポートフォリオ
+   ========================================================= */
+function renderPortfolio(){
+  const ids=Object.keys(PORTFOLIO).filter(id=>PORTFOLIO[id]>0);
+  const holdings=document.getElementById("holdings");
+  let value=0, cost=0;
+  if(ids.length===0){
+    holdings.innerHTML=`<div class="empty">まだ出資していません。<br>マーケットから気になるプロジェクトに出資してみましょう。</div>`;
+  } else {
+    holdings.innerHTML=ids.map(id=>{
+      const p=PROJECTS.find(x=>x.id==id), q=PORTFOLIO[id], v=p.price*q;
+      value+=v;
+      const d=((p.price-p.prev)/p.prev*100), up=d>=0;
+      return `<div class="holding" onclick="openModal(${p.id})" style="cursor:pointer">
+        <div style="width:90px">${spark(p.h.slice(-14),90,34,up?'#2ec26b':'#ff5d6c')}</div>
+        <div class="name"><b>${p.name}</b><div>${q}株 · ${yen(p.price)}/株</div></div>
+        <div style="text-align:right"><b>${yen(v)}</b>
+          <div class="delta ${up?'u':'d'}" style="display:inline-block;margin-top:4px">${up?'▲':'▼'} ${Math.abs(d).toFixed(2)}%</div></div>
+      </div>`;
+    }).join("");
+  }
+  // 投資額は簡易的に「評価額の少し下」で表現（プロトタイプの割り切り）
+  cost = value*0.92;
+  const pl=value-cost;
+  document.getElementById("pf-total").textContent=yen(CASH+value);
+  document.getElementById("pf-cash").textContent=yen(CASH);
+  document.getElementById("pf-hold").textContent=ids.length+"銘柄";
+  const plEl=document.getElementById("pf-pl");
+  plEl.textContent=(pl>=0?"+":"−")+yen(Math.abs(pl));
+  plEl.className=(pl>=0?"up":"down");
+}
+
+/* =========================================================
+   上場申請：フォームから新しいプロジェクトをマーケットに追加
+   ========================================================= */
+// 銘柄タイプの選択で満期日欄を出し入れ
+document.getElementById("f-type").onchange=e=>{
+  document.getElementById("f-deadline-wrap").classList.toggle("hidden", e.target.value!=="単発");
+};
+
+/* 審査待ち・審査中・判定済みのプロジェクトを溜めておく配列 */
+const PENDING=[];
+
+function renderPending(){
+  const wrap=document.getElementById("pending-wrap");
+  const el=document.getElementById("pending");
+  if(PENDING.length===0){ wrap.classList.add("hidden"); return; }
+  wrap.classList.remove("hidden");
+  el.innerHTML=PENDING.map(x=>{
+    let status,sub;
+    if(x.status==="screening"){ status=`<span class="status scr"><span class="spin"></span>反社・AML照合中</span>`; sub=`本人確認：${x.doc}／発起人 ${x.founder}`; }
+    else if(x.status==="reviewing"){ status=`<span class="status rev"><span class="spin"></span>AI審査中</span>`; sub=`反社・AMLチェック クリア／${x.cat}`; }
+    else if(x.status==="approved"){ status=`<span class="status ok">✓ 上場承認</span>`; sub=`本人確認・反社チェック・AI審査を通過し、上場しました。`; }
+    else { status=`<span class="status ng">要再申請</span>`; sub=`否決理由：${x.reason}`; }
+    return `<div class="pend"><div class="info"><b>${x.name}</b><div>${sub}</div></div>${status}</div>`;
+  }).join("");
+}
+
+/* AIによる自動審査（プロトタイプ用の簡易ロジック）
+   本番なら概要・実績・リターン設計・健全性などをモデルが評価します。
+   ここでは「概要が具体的か（文字数）」で通過/否決を分けています。 */
+function aiReview(item){
+  if(item.desc && item.desc.length>=15){
+    item.status="approved";
+    PROJECTS.unshift({id:item.id, name:item.name, tag:item.tag, cat:item.cat, founder:item.founder,
+      price:item.price, prev:Math.round(item.price*0.98), goal:item.goal, raised:0, supporters:1,
+      seats:5, desc:item.desc, h:hist(item.price), oneoff:item.oneoff, deadline:item.oneoff?item.deadline:null});
+    renderGrid();
+    toast(`✅ AI審査を通過。「${item.name}」が上場しました`);
+  } else {
+    item.status="rejected";
+    item.reason="概要が不足しています。目的・実現性・実績をもう少し具体的に書いてください。";
+    toast(`⚠️ AI審査：要再申請（${item.name}）`);
+  }
+  renderPending();
+}
+
+document.getElementById("ipo-submit").onclick=()=>{
+  const name=document.getElementById("f-name").value.trim();
+  const tag=document.getElementById("f-tag").value.trim();
+  if(!name||!tag){ toast("プロジェクト名とキャッチは必須です"); return; }
+
+  // --- 本人確認（KYC）チェック：ここを通らないと審査に進めない ---
+  const kName=document.getElementById("k-name").value.trim();
+  const kBirth=document.getElementById("k-birth").value;
+  const kDoc=document.getElementById("k-doc").value;
+  const kFile=document.getElementById("k-file").files.length>0;
+  const kAgree=document.getElementById("k-agree").checked;
+  const kAnti=document.getElementById("k-antisocial").checked;
+  if(!kName||!kBirth||!kDoc||!kFile||!kAgree||!kAnti){
+    toast("🔒 本人確認が未完了です（本名・生年月日・書類・2つの同意が必須）");
+    document.querySelector(".kyc").scrollIntoView({behavior:"smooth",block:"center"});
+    return;
+  }
+
+  const price=+document.getElementById("f-price").value||1000;
+  const goal=+document.getElementById("f-goal").value||3000000;
+  const oneoff=document.getElementById("f-type").value==="単発";
+  let deadline=document.getElementById("f-deadline").value;
+  if(oneoff && !deadline){ const d=new Date(Date.now()+90*86400000); deadline=d.toISOString().slice(0,10); }
+
+  const item={id:Date.now(), name, tag, cat:document.getElementById("f-cat").value,
+    founder:document.getElementById("f-founder").value.trim()||kName,
+    price, goal, oneoff, deadline,
+    desc:document.getElementById("f-desc").value.trim(),
+    doc:kDoc, status:"screening"};
+  PENDING.unshift(item);
+
+  // フォームを軽くリセット（本人確認は残す）
+  ["f-name","f-tag","f-desc"].forEach(i=>document.getElementById(i).value="");
+  renderPending();
+  document.getElementById("pending-wrap").scrollIntoView({behavior:"smooth",block:"start"});
+  toast("🔒 本人確認OK。反社・AMLチェックを照合中…");
+  // ① 反社・AML照合（1.5秒）→ ② AI審査（さらに1.7秒後に判定）
+  setTimeout(()=>{ item.status="reviewing"; renderPending(); toast("🛡 反社・AMLチェック クリア。AI審査に進みます…"); }, 1500);
+  setTimeout(()=>aiReview(item), 3200);
+};
+
+/* =========================================================
+   ティッカー・株価のライブ変動・共通処理
+   ========================================================= */
+function buildTicker(){
+  const t=PROJECTS.map(p=>{
+    const d=((p.price-p.prev)/p.prev*100),up=d>=0;
+    return `<span><b>${p.name.slice(0,8)}</b>${yen(p.price)} <span class="${up?'up':'down'}">${up?'▲':'▼'}${Math.abs(d).toFixed(1)}%</span></span>`;
+  }).join("");
+  document.getElementById("ticker").innerHTML=t+t; // 2回並べて途切れなくループ
+}
+function updateCash(){ document.getElementById("cash").textContent=yen(CASH); }
+
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove("show"),2200);
+}
+
+// 市場が"生きている"感じ：数秒ごとに各株価を微妙に揺らす
+setInterval(()=>{
+  PROJECTS.forEach(p=>{
+    p.prev=p.price;
+    p.price=Math.max(100,Math.round(p.price*(1+(Math.random()-0.5)*0.03)));
+    p.h.push(p.price); if(p.h.length>60)p.h.shift();
+  });
+  buildTicker();
+  if(!document.getElementById("view-market").classList.contains("hidden")){ renderGrid(); renderRanking(); renderAccount(); }
+  if(!document.getElementById("view-portfolio").classList.contains("hidden")) renderPortfolio();
+},4000);
+
+// 初期描画
+renderGrid(); renderRanking(); renderAccount(); buildTicker(); updateCash();
+</script>
+</body>
+</html>
