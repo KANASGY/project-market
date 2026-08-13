@@ -708,7 +708,7 @@ function modeBadge(p){ return p.toshi
    パスワードゲート（関係者限定プレビュー）
    ※ 静的サイトのため簡易ロックです。パスワードは下記で変更できます。
    ========================================================= */
-const ACCESS_PASSWORD = "pmbank2026";   // ← パスワードはここを書き換えて変更
+const ACCESS_PASSWORD = "pm26";   // ← パスワードはここを書き換えて変更
 function tryGate(){
   const v=document.getElementById("gate-pw").value;
   if(v===ACCESS_PASSWORD){ document.getElementById("gate").style.display="none"; document.body.style.overflow=""; }
