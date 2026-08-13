@@ -37,7 +37,7 @@
   header{position:sticky;top:0;z-index:50;background:rgba(13,16,23,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
   .topbar{display:flex;align-items:center;gap:20px;height:62px}
   .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.02em}
-  .logo .mark{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--brand),#4ad0ff);display:grid;place-items:center;font-size:15px}
+  .logo .mark{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#8b78ff,#4a34b0);display:grid;place-items:center;font-size:15px}
   .logo small{color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.14em}
   nav{display:flex;gap:4px;margin-left:auto}
   nav button{background:transparent;color:var(--muted);padding:8px 14px;border-radius:10px;font-weight:700;font-size:14px}
@@ -281,6 +281,21 @@
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--panel-2);border:1px solid var(--brand);color:var(--text);padding:13px 20px;border-radius:12px;font-weight:700;font-size:14px;opacity:0;transition:.3s;z-index:200;box-shadow:0 10px 40px rgba(0,0,0,.5)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .hidden{display:none!important}
+  /* パスワードゲート（関係者限定プレビュー） */
+  .gate{position:fixed;inset:0;z-index:300;background:radial-gradient(1000px 600px at 75% -10%,#1a2030,#0d1017 60%);display:flex;align-items:center;justify-content:center;padding:20px}
+  .gate .box{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:30px 26px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .gate .mk{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#8b78ff,#4a34b0);display:grid;place-items:center;font-size:24px;margin:0 auto 14px}
+  .gate h2{margin:0 0 6px;font-size:20px}
+  .gate .lead{color:var(--muted);font-size:13px;margin:0 0 18px;line-height:1.6}
+  .gate input{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:13px 14px;color:var(--text);font-size:15px;text-align:center;letter-spacing:.12em;outline:none}
+  .gate input:focus{border-color:var(--brand)}
+  .gate .err{color:var(--down);font-size:12px;margin-top:8px;min-height:16px;font-weight:700}
+  .gate button{width:100%;margin-top:8px;padding:13px;border-radius:12px;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,#8b78ff,#6b5bff)}
+  .gate .note{font-size:11px;color:var(--muted);margin-top:16px;letter-spacing:.06em}
+  /* フッター（著作権・機密表記） */
+  .site-foot{max-width:1080px;margin:26px auto 36px;padding:16px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:12px}
+  .site-foot .conf{font-weight:800;letter-spacing:.08em;color:#ffb15e}
+  @media(max-width:560px){.site-foot{flex-direction:column;text-align:center}}
   @media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.pf-summary{grid-template-columns:1fr}.hero h1{font-size:24px}}
 
   /* ===== スマホ最適化 ===== */
@@ -322,6 +337,17 @@
 </style>
 </head>
 <body>
+<div class="gate" id="gate">
+  <div class="box">
+    <div class="mk">📈</div>
+    <h2>プロジェクトマーケット</h2>
+    <p class="lead">関係者限定のプレビューです。<br>パスワードを入力してください。</p>
+    <input id="gate-pw" type="password" placeholder="パスワード" autocomplete="off" inputmode="text">
+    <div class="err" id="gate-err"></div>
+    <button onclick="tryGate()">開く</button>
+    <div class="note">CONFIDENTIAL — 無断転載・共有を禁じます</div>
+  </div>
+</div>
 
 <header>
   <div class="wrap topbar">
@@ -550,6 +576,11 @@
   </section>
 </main>
 
+<footer class="site-foot wrap">
+  <span>© 2026 Hajime Kanasugi. All rights reserved.</span>
+  <span class="conf">CONFIDENTIAL — 無断転載・共有を禁じます</span>
+</footer>
+
 <!-- ===== 詳細モーダル ===== -->
 <div class="overlay" id="overlay">
   <div class="modal" style="position:relative" id="modal"></div>
@@ -672,6 +703,22 @@ PROJECTS.forEach(p=>{ p.toshi = TOSHI.has(p.id); });
 function modeBadge(p){ return p.toshi
   ? `<span class="badge toshi">上場 · 配当あり</span>`
   : `<span class="badge ouen">IPO前 · 未上場</span>`; }
+
+/* =========================================================
+   パスワードゲート（関係者限定プレビュー）
+   ※ 静的サイトのため簡易ロックです。パスワードは下記で変更できます。
+   ========================================================= */
+const ACCESS_PASSWORD = "pmbank2026";   // ← パスワードはここを書き換えて変更
+function tryGate(){
+  const v=document.getElementById("gate-pw").value;
+  if(v===ACCESS_PASSWORD){ document.getElementById("gate").style.display="none"; document.body.style.overflow=""; }
+  else { document.getElementById("gate-err").textContent="パスワードが違います"; document.getElementById("gate-pw").select(); }
+}
+(function(){
+  document.body.style.overflow="hidden";
+  const pw=document.getElementById("gate-pw");
+  if(pw){ pw.addEventListener("keydown",e=>{ if(e.key==="Enter") tryGate(); }); setTimeout(()=>pw.focus(),200); }
+})();
 
 /* =========================================================
    画面の切り替え（マーケット / ポートフォリオ / 上場申請）
