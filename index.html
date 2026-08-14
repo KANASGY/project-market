@@ -342,7 +342,7 @@
     <div class="mk">📈</div>
     <h2>プロジェクトマーケット</h2>
     <p class="lead">関係者限定のプレビューです。<br>パスワードを入力してください。</p>
-    <input id="gate-pw" type="password" placeholder="パスワード" autocomplete="off" inputmode="text">
+    <input id="gate-pw" type="password" placeholder="パスワード" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text">
     <div class="err" id="gate-err"></div>
     <button onclick="tryGate()">開く</button>
     <div class="note">CONFIDENTIAL — 無断転載・共有を禁じます</div>
@@ -710,8 +710,8 @@ function modeBadge(p){ return p.toshi
    ========================================================= */
 const ACCESS_PASSWORD = "pm26";   // ← パスワードはここを書き換えて変更
 function tryGate(){
-  const v=document.getElementById("gate-pw").value;
-  if(v===ACCESS_PASSWORD){ document.getElementById("gate").style.display="none"; document.body.style.overflow=""; }
+  const v=document.getElementById("gate-pw").value.trim().toLowerCase();
+  if(v===ACCESS_PASSWORD.trim().toLowerCase()){ document.getElementById("gate").style.display="none"; document.body.style.overflow=""; }
   else { document.getElementById("gate-err").textContent="パスワードが違います"; document.getElementById("gate-pw").select(); }
 }
 (function(){
