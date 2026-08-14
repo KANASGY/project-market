@@ -487,12 +487,12 @@
 
   <!-- ===== メモ（事業のぜんぶを収納） ===== -->
   <section id="view-memo" class="hidden">
-    <div class="sec-head"><h2>メモ ── この事業のぜんぶ</h2></div>
+    <div class="sec-head"><h2>メモ ── この事業の概要</h2></div>
     <div class="tagline" style="margin:-6px 2px 16px">デモの裏にある、コンセプト・決定・計画・審査をここに収納。<b>プロジェクトを“上場”させる、プロジェクトの証券取引所。</b> プロジェクトエコノミー時代の取引所。</div>
 
     <div class="memo-sec memo-launch">
       <h3>📋 上場審査（応募）</h3>
-      <p>誰でも載せられるクラファンではなく、<b>応募 →（本人確認・反社/AML・AI審査の）三段審査 → 通過した挑戦だけが上場</b>。ここから応募フローを開けます。</p>
+      <p>誰でも応募できるクラファンではなく、<b>応募 →（本人確認・反社/AML・AI審査の）三段審査 → 通過した挑戦だけが上場</b>。ここから応募フローを開けます。</p>
       <button class="btn" onclick="show('ipo')">上場審査を開く →</button>
     </div>
 
@@ -524,6 +524,21 @@
         <h3>🎓 上場講座（供給エンジン）</h3>
         <p>セミナー＋本講座（全6回）。<b>修了＝上場</b>。挑戦者が生まれる場所を押さえ、<b>オープン時に並べる“最初の挑戦”を自前でそろえ</b>、<b>先に収益</b>が立つ。参入障壁④の実装。</p>
       </div>
+    </div>
+
+    <div class="memo-sec">
+      <h3>💰 売上・利益（ビジネスモデル）</h3>
+      <p>稼ぎ方は<b>二段ロケット</b>。立ち上げ期は<b>①上場講座の受講料</b>が先に立ち（供給＝挑戦者を生む場所を押さえながら先に黒字化）、流通が育つと<b>②取引手数料</b>が積み上がる。取引所は本質的に“場所代（テイクレート）”で稼ぐ構造なので、銘柄と応援が増えるほど限界費用ほぼゼロで伸びる。</p>
+      <table class="memo-tbl">
+        <tr><td>① 上場講座 受講料</td><td>セミナー＋本講座（全6回）。修了＝上場。<b>先行収益</b>かつ供給エンジン。粗利が高い。</td></tr>
+        <tr><td>② 応援決済 手数料</td><td>IPO前の応援（一次流通）の決済額に対して数％。</td></tr>
+        <tr><td>③ 二次流通 取引手数料</td><td>上場後の売買（二次流通）の約定額に対して数％。流動性が増えるほど積み上がる<b>本命</b>。</td></tr>
+        <tr><td>④ 上場・審査料</td><td>応募・上場時の一時金。健全性の担保コストに充当。</td></tr>
+        <tr><td>⑤ 運用フィー／配当仲介</td><td>投資型（L3）の管理報酬、配当分配の仲介手数料。</td></tr>
+        <tr><td>（将来）</td><td>プレミアム会員、データ・IR支援、広告など。</td></tr>
+      </table>
+      <p style="margin-top:10px"><b>コスト構造：</b>審査（本人確認・反社/AML）の外部委託費、決済手数料、システム開発・運用、法務・登録維持、人件費。<b>利益の芯</b>は限界費用の低い〈受講料〉と〈取引手数料〉。</p>
+      <p style="margin-top:8px"><b>利益の出方：</b>講座で先に黒字化 →〈流通額(GMV)×テイクレート〉が乗って伸びる二段構え。<span style="opacity:.7">※具体的な売上・利益額は事業計画で別途試算（現在準備中）。</span></p>
     </div>
 
     <div class="memo-sec">
@@ -709,10 +724,11 @@ function modeBadge(p){ return p.toshi
    ※ 静的サイトのため簡易ロックです。パスワードは下記で変更できます。
    ========================================================= */
 const ACCESS_PASSWORD = "pm26";   // ← パスワードはここを書き換えて変更
+function normPw(s){ return (s||"").normalize("NFKC").replace(/\s+/g,"").toLowerCase(); }  // 全角→半角・空白除去・小文字化
 function tryGate(){
-  const v=document.getElementById("gate-pw").value.trim().toLowerCase();
-  if(v===ACCESS_PASSWORD.trim().toLowerCase()){ document.getElementById("gate").style.display="none"; document.body.style.overflow=""; }
-  else { document.getElementById("gate-err").textContent="パスワードが違います"; document.getElementById("gate-pw").select(); }
+  const v=normPw(document.getElementById("gate-pw").value);
+  if(v===normPw(ACCESS_PASSWORD)){ document.getElementById("gate").style.display="none"; document.body.style.overflow=""; }
+  else { document.getElementById("gate-err").textContent="パスワードが違います（半角で pm26 と入力）"; document.getElementById("gate-pw").select(); }
 }
 (function(){
   document.body.style.overflow="hidden";
