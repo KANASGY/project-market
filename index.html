@@ -56,6 +56,36 @@
   .hero{padding:34px 0 10px}
   .hero h1{font-size:30px;margin:0 0 8px;letter-spacing:-.01em}
   .hero p{color:var(--muted);margin:0;font-size:15px;line-height:1.7}
+  /* マーケット冒頭のベネフィット訴求 */
+  .mkt-hero{padding:30px 0 4px}
+  .mkt-hero h1{font-size:30px;line-height:1.28;margin:0 0 10px;letter-spacing:-.01em}
+  .mkt-hero p{color:var(--text);font-size:15px;line-height:1.75;margin:0;max-width:760px}
+  .mkt-hero p b{color:#c9c2ff}
+  .mkt-hero .mkt-sub{color:var(--muted);font-size:12.5px;margin-top:8px}
+  @media(max-width:640px){.mkt-hero{padding:18px 0 2px}.mkt-hero h1{font-size:22px}.mkt-hero p{font-size:14px}}
+  /* ポートフォリオ 2カラム＋分析パネル */
+  .pf-layout{display:grid;grid-template-columns:1fr;gap:22px;align-items:start}
+  @media(min-width:860px){.pf-layout{grid-template-columns:1.7fr 1fr}}
+  .pf-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .pf-donut-wrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .pf-legend{flex:1;min-width:150px;font-size:12px}
+  .pf-legend .lg{display:flex;align-items:center;gap:8px;margin:7px 0}
+  .pf-legend .sw{width:10px;height:10px;border-radius:3px;flex:none}
+  .pf-legend .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+  .pf-legend .vl{color:var(--text);font-weight:700}
+  .pf-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .pf-stat{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .pf-stat .k{font-size:11px;color:var(--muted);font-weight:700}
+  .pf-stat .v{font-size:19px;font-weight:800;margin-top:4px;letter-spacing:-.01em}
+  .pf-stat .v.gold{color:#ffcf6a}
+  /* ビジョン */
+  .vision{background:linear-gradient(135deg,rgba(124,108,255,.16),rgba(74,208,255,.07));border:1px solid rgba(124,108,255,.32);border-radius:16px;padding:24px 22px;margin:2px 0 16px}
+  .vision .vk{font-size:11px;letter-spacing:.2em;color:var(--brand);font-weight:800}
+  .vision h1{font-size:28px;margin:8px 0;letter-spacing:-.01em}
+  .vision p{color:var(--muted);font-size:14px;line-height:1.75;margin:0;max-width:680px}
+  .vision p b{color:#c9c2ff}
+  @media(max-width:640px){.vision{padding:18px 16px}.vision h1{font-size:22px}}
+  .mkt-eyebrow{font-size:12px;letter-spacing:.16em;color:var(--brand);font-weight:800;margin-bottom:8px}
 
   /* 口座サマリー */
   .account{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:26px 0 8px;flex-wrap:wrap}
@@ -380,6 +410,12 @@
 <!-- ===== マーケット ===== -->
 <main class="wrap">
   <section id="view-market">
+    <div class="mkt-hero">
+      <div class="mkt-eyebrow">経済をもっと創造的に。</div>
+      <h1>応援が、数字と価値になって育つ。</h1>
+      <p>気になるプロジェクトを“銘柄”として応援。<b>応援するほど価値（株価）が伸び</b>、育てばIPO、<b>配当</b>まで受け取れる——プロジェクトの新しい市場。</p>
+      <p class="mkt-sub">クラウドファンディングではなく、プロジェクトの“証券取引所”。〈プレ上場（IPO前）→ IPO（上場・配当）→ 二次流通〉。</p>
+    </div>
     <!-- 口座サマリー（ネット証券のトップにある“あなたの口座”）-->
     <div class="account">
       <div class="acc-cell hero-cell">
@@ -391,7 +427,6 @@
       <div class="acc-cell"><span>現金残高</span><b id="acc-cash">¥1,000,000</b></div>
       <div class="acc-cell"><span>保有銘柄</span><b id="acc-hold">0</b></div>
     </div>
-    <div class="tagline">クラウドファンディングではなく、プロジェクトの<b>証券取引所</b>。<b>アップ（LISTED）</b>から応援でき、実績を出して<b>IPO（上場）</b>すれば配当が解禁、いずれ<b>二次流通（SECONDARY）</b>へ。</div>
 
     <!-- ランキング（値上がり率・応援数・満期間近・ウォッチ）-->
     <div class="sec-head"><h2>ランキング</h2><div id="rank-tabs"></div></div>
@@ -416,19 +451,27 @@
       <div class="acc-cell"><span>現金残高</span><b id="pf-cash">¥1,000,000</b></div>
       <div class="acc-cell"><span>保有銘柄</span><b id="pf-hold">0</b></div>
     </div>
-    <div class="sec-head"><h2>保有銘柄</h2></div>
-    <div id="holdings"></div>
+    <div class="pf-layout">
+      <div class="pf-main">
+        <div class="sec-head"><h2>保有銘柄</h2></div>
+        <div id="holdings"></div>
+      </div>
+      <aside class="pf-side">
+        <div class="sec-head"><h2>ポートフォリオ分析</h2></div>
+        <div id="pf-insights"></div>
+      </aside>
+    </div>
   </section>
 
   <!-- ===== 上場申請 ===== -->
   <section id="view-ipo" class="hidden">
     <button class="btn ghost" style="margin:8px 0 4px" onclick="show('memo')">← 概要へ戻る</button>
     <div class="hero">
-      <h1>マーケットにアップされるには、審査をパスする必要があります。</h1>
-      <p>ここは、誰でも載せられるクラウドファンディングではありません。<br>アップの前提として<b style="color:var(--text)">本人確認（住民票・戸籍謄本など）</b>と<b style="color:var(--text)">反社・AMLチェック</b>を行い、そのうえで提出内容を<b style="color:var(--text)">AIが審査基準に照らして審査</b>します。パスした挑戦だけがマーケットにアップ（＝LISTED）。だから出資する側は、"実在する人物の、審査を通った挑戦"にだけ向き合える。</p>
+      <h1>プレ上場するには、上場申請の審査を通過する必要があります。</h1>
+      <p>ここは、誰でも載せられるクラウドファンディングではありません。<br>プレ上場の前提として<b style="color:var(--text)">本人確認（住民票・戸籍謄本など）</b>と<b style="color:var(--text)">反社・AMLチェック</b>を行い、そのうえで提出内容を<b style="color:var(--text)">AIが審査基準に照らして審査</b>します。通過した挑戦だけが市場に並ぶ（＝プレ上場／LISTED）。だから出資する側は、"実在する人物の、審査を通った挑戦"にだけ向き合える。</p>
     </div>
 
-    <h3 style="margin:8px 0 12px;font-size:15px;color:var(--muted);font-weight:700">審査の基準（ノミネート審査で見るポイント）</h3>
+    <h3 style="margin:8px 0 12px;font-size:15px;color:var(--muted);font-weight:700">審査の基準（上場申請で見るポイント）</h3>
     <div class="criteria">
       <div class="crit"><div class="n">01</div><b>実現可能性</b><span>ゴールが具体的で、達成までの道筋・体制が描けているか。</span></div>
       <div class="crit"><div class="n">02</div><b>発起人の本気度と実績</b><span>過去の活動・進捗が確認でき、途中で投げ出さないか。</span></div>
@@ -439,8 +482,8 @@
     </div>
 
     <div class="form">
-      <h3 style="margin:0 0 4px;font-size:18px">審査にノミネートする</h3>
-      <div class="hint" style="margin-bottom:6px">送信すると<b>審査待ち</b>に入ります。この場では即アップされません（下の「審査中」に並びます）。</div>
+      <h3 style="margin:0 0 4px;font-size:18px">上場申請する（審査を受ける）</h3>
+      <div class="hint" style="margin-bottom:6px">送信すると<b>審査待ち</b>に入ります。この場では即プレ上場しません（下の「審査中」に並びます）。</div>
       <label>プロジェクト名 *</label>
       <input id="f-name" placeholder="例：地方の空き家を宿に変えるプロジェクト">
       <label>ひとことキャッチ *</label>
@@ -500,44 +543,49 @@
   <!-- ===== メモ（事業のぜんぶを収納） ===== -->
   <section id="view-memo" class="hidden">
     <div class="sec-head"><h2>事業の概要</h2></div>
+    <div class="vision">
+      <div class="vk">VISION</div>
+      <h1>経済をもっと創造的に。</h1>
+      <p>会社になる前の挑戦に市場をひらき、<b>応援がそのまま価値になる</b>——プロジェクトそのものが資産になる、新しい経済圏をつくる。</p>
+    </div>
     <div class="tagline" style="margin:-6px 2px 16px"><b>プロジェクトを“上場”させる、プロジェクトの証券取引所。</b> プロジェクトエコノミー時代の取引所。</div>
 
     <div class="memo-sec">
       <h3>🧭 一言コンセプト</h3>
-      <p>あらゆるプロジェクトを“銘柄”として<b>アップ（LISTED）</b>。応援で株価が動き、実績を出せば<b>IPO（上場）</b>で配当が解禁、いずれ二次流通へ。クラファンではなく<b>取引所</b>。〈<b>ノミネート → 審査 → パス → アップ(LISTED) → PRE-IPO → IPO → 二次流通(SECONDARY)</b>〉の一本道。</p>
+      <p>あらゆるプロジェクトを“銘柄”として<b>プレ上場（IPO前）</b>。応援で株価が動き、実績を出せば<b>IPO（上場）</b>で配当が解禁、いずれ二次流通へ。クラファンではなく<b>取引所</b>。〈<b>上場申請 → 審査 → プレ上場（IPO前）→ IPO → 二次流通(SECONDARY)</b>〉の一本道。</p>
     </div>
 
     <div class="memo-sec">
       <h3>💠 事業モデル</h3>
       <p>リターン3階建て：<b>L1 応援</b>（非金銭）／<b>L2 優待</b>（疑似配当）／<b>L3 投資</b>（金銭分配）。軽く始め、育った銘柄だけ本格化。</p>
-      <p>収益源：審査・アップ手数料、取引手数料、投資型の運用フィー、<b>上場研修の受講料</b>。</p>
+      <p>収益源：上場申請・審査手数料、取引手数料、投資型の運用フィー、<b>上場研修の受講料</b>。</p>
       <p><b>株主特典（優待）：</b>保有者には<b>先行購入権・限定リターン・イベント招待・株主限定コンテンツ</b>などの特典を用意。応援を続ける動機になり、売り圧を抑えて株価を支える。</p>
     </div>
 
     <div class="memo-sec">
       <h3>💰 売上・利益（ビジネスモデル）</h3>
-      <p>稼ぎ方は<b>二段ロケット</b>。立ち上げ期は<b>①上場研修の受講料</b>が先に立ち（供給＝挑戦者を生む場所を押さえながら先に黒字化）、流通が育つと<b>②取引手数料</b>が積み上がる。取引所は本質的に“場所代（テイクレート）”で稼ぐ構造なので、銘柄と応援が増えるほど限界費用ほぼゼロで伸びる。</p>
+      <p><b>本業は取引所（テイクレート）</b>。銘柄と応援が増えるほど、限界費用ほぼゼロで<b>②取引手数料</b>が積み上がる。立ち上げ期は<b>①上場研修</b>が良質な銘柄を供給しつつ受講料で初期収益も支えるが、<b>主目的は“上場で稼ぐ”ことではなく、市場の質を立ち上げること</b>。稼ぎの本丸はあくまで流通（取引所）。</p>
       <table class="memo-tbl">
-        <tr><td>① 上場研修 受講料</td><td>セミナー＋本研修（全6回）。修了→審査へ（修了しても審査あり）。<b>先行収益</b>かつ供給エンジン。粗利が高い。</td></tr>
-        <tr><td>② 応援決済 手数料</td><td>アップ後・IPO前の応援（一次流通）の決済額に対して数％。</td></tr>
+        <tr><td>① 上場研修 受講料</td><td>セミナー＋本研修（全6回）。修了→審査へ（修了しても審査あり）。<b>インキュベーション</b>が主目的で、初期収益も支える（粗利は高い）。</td></tr>
+        <tr><td>② 応援決済 手数料</td><td>プレ上場後（IPO前）の応援（一次流通）の決済額に対して数％。</td></tr>
         <tr><td>③ 二次流通 取引手数料</td><td>上場後の売買（二次流通）の約定額に対して数％。流動性が増えるほど積み上がる<b>本命</b>。</td></tr>
-        <tr><td>④ 審査・アップ料</td><td>ノミネート・アップ時に受け取る一時金（リスティングフィー）。健全性の担保コストに充当し、冷やかし応募も抑える。</td></tr>
+        <tr><td>④ 上場申請・審査料</td><td>申請・プレ上場時に受け取る一時金（リスティングフィー）。健全性の担保コストに充当し、冷やかし応募も抑える。</td></tr>
         <tr><td>⑤ 運用フィー／配当仲介</td><td>投資型（L3）の管理報酬、配当分配の仲介手数料。</td></tr>
         <tr><td>（将来）</td><td>プレミアム会員、データ・IR支援など。</td></tr>
       </table>
       <p style="margin-top:10px"><b>コスト構造：</b>審査（本人確認・反社/AML）の外部委託費、決済手数料、システム開発・運用、法務・登録維持、人件費。<b>利益の芯</b>は限界費用の低い〈受講料〉と〈取引手数料〉。</p>
-      <p style="margin-top:8px"><b>利益の出方：</b>研修で先に黒字化 →〈流通額(GMV)×テイクレート〉が乗って伸びる二段構え。<span style="opacity:.7">※具体的な売上・利益額は事業計画で別途試算（現在準備中）。</span></p>
+      <p style="margin-top:8px"><b>利益の出方：</b>ラボで良質な供給と初期収益を立ち上げ →〈流通額(GMV)×テイクレート〉が<b>本丸</b>として伸びる二段構え。<span style="opacity:.7">※具体的な売上・利益額は事業計画で別途試算（現在準備中）。</span></p>
     </div>
 
     <div class="memo-sec memo-launch">
-      <h3>📋 ノミネート（審査に応募）</h3>
-      <p>誰でも応募できるクラファンではなく、<b>ノミネート →（本人確認・反社/AML・AI審査の）三段審査 → パスした挑戦だけがマーケットにアップ（LISTED）</b>。ここからノミネートを開けます。</p>
-      <button class="btn" onclick="show('ipo')">ノミネートする →</button>
+      <h3>📋 上場申請（審査を受ける）</h3>
+      <p>誰でも応募できるクラファンではなく、<b>上場申請 →（本人確認・反社/AML・AI審査の）三段審査 → 通過した挑戦だけがプレ上場（IPO前・LISTED）</b>。ここから申請を開けます。</p>
+      <button class="btn" onclick="show('ipo')">上場申請する →</button>
     </div>
 
     <div class="memo-sec">
-      <h3>🎓 上場研修（供給エンジン）</h3>
-      <p>セミナー＋本研修（全6回）。<b>修了→審査へ</b>（修了しても審査で落ちることはある）。挑戦者が生まれる場所を押さえ、<b>オープン時に並べる“最初の挑戦”を自前でそろえ</b>、<b>先に収益</b>が立つ。参入障壁④の実装。</p>
+      <h3>🎓 上場研修（インキュベーション）</h3>
+      <p>セミナー＋本研修（全6回）。<b>修了→審査へ</b>（修了しても審査で落ちることはある）。<b>収益源である以上に、市場に並ぶ挑戦の“質”を担保する装置</b>。良質な銘柄を生み、オープン時に並べる“最初の挑戦”を自前でそろえる——だから市場の信頼が立ち上がる。参入障壁④の実装。</p>
     </div>
 
     <div class="memo-sec">
@@ -566,7 +614,7 @@
         <tr><td>①議決権なし</td><td>“株”は経済的な応援・分配の権利だけ。<b>経営支配は発起人に固定</b> → 買い占めてもプロジェクトは乗っ取れない＝旨味が消える。</td></tr>
         <tr><td>②保有上限</td><td>1人（1グループ）の保有割合に上限。本人確認で<b>名寄せ</b>し、複数アカウントの抜け道も封じる。</td></tr>
         <tr><td>③高くつく曲線</td><td>買い増すほど価格が上がる<b>ボンディングカーブ＋実績アンカー</b>。占有のコストを跳ね上げ、買い圧だけでは動かせない。</td></tr>
-        <tr><td>④規模で流通制限</td><td>一定の時価総額・浮動株・応援者数を満たすまで<b>二次流通させない</b>（アップ/PRE-IPOに留める）。東証の上場基準と同じ発想。</td></tr>
+        <tr><td>④規模で流通制限</td><td>一定の時価総額・浮動株・応援者数を満たすまで<b>二次流通させない</b>（プレ上場＝IPO前に留める）。東証の上場基準と同じ発想。</td></tr>
       </table>
       <p style="margin-top:10px"><b>二次流通を開くときの共通策：</b>ロックアップ、値幅制限・サーキットブレーカー、市場監視AI、発起人・関係者の売買制限＆開示、板の透明化。</p>
       <p><b>最大の抑止：</b>二次流通は金商法（相場操縦の禁止）の下で運営 → 仕手は“違法”として取り締まれる。<b>①〜④と共通策が揃うまで二次流通は開かない。応援型に留める限り、仕手は成立しない。</b></p>
@@ -574,7 +622,7 @@
 
     <div class="memo-sec">
       <h3>🤖 全自動オペレーション ＆ セキュリティ</h3>
-      <p><b>運営は全自動（＝運営側の話）：</b>ノミネート受付 → 本人確認・反社/AML照合 → AI審査 → アップ → 株価・板・IPO判定 → 配当計算まで、<b>運営側にオペレーターを常駐させず、システムが自動実行</b>。だから運営コストが軽く、24時間・スケールしても回る。<span style="opacity:.75">（利用者の体験は「発見→応援→保有→成長→IPO→リターン」。自動化は裏方の話。）</span></p>
+      <p><b>運営は全自動（＝運営側の話）：</b>上場申請受付 → 本人確認・反社/AML照合 → AI審査 → プレ上場 → 株価・板・IPO判定 → 配当計算まで、<b>運営側にオペレーターを常駐させず、システムが自動実行</b>。だから運営コストが軽く、24時間・スケールしても回る。<span style="opacity:.75">（利用者の体験は「発見→応援→保有→成長→IPO→リターン」。自動化は裏方の話。）</span></p>
       <p style="margin-top:10px"><b>ハッキング・攻撃への備え：</b></p>
       <table class="memo-tbl">
         <tr><td>アカウント</td><td>多要素認証（MFA）＋本人確認（KYC）で実在性を担保。不正ログイン・乗っ取りを検知し自動ロック。</td></tr>
@@ -594,15 +642,15 @@
 
     <div class="memo-sec">
       <h3>🕓 バージョンログ（プロトタイプ）</h3>
-      <p class="memo-log">v0.1 基本の上場マーケット ／ v0.7 クラファンから取引所へ（審査＋本人確認） ／ v1.0 ネット証券ホーム ／ v1.1 三段審査 ／ v1.2 名称統一 ／ v1.3 二層モデル ／ v1.4 IPO前→上場→流通に再定義 ／ v1.5 個別銘柄ページ ／ v1.7 板売買・チャートホバー ／ v1.8 指値発注・ポートフォリオ整列 ／ v1.9 上場審査＋事業ノートを「メモ」に収納 ／ v2.0 メモ再構成 ／ v2.1 事業モデルを前段へ・株主特典追加・発行株数＋チャート行内化 ／ v2.2 ランキング横はみ出し修正・チャート幅最適化 ／ v2.3 パスワード撤廃・「概要」タブ化 ／ v2.4 用語を4段階に厳密化 ／ v2.5 「上場研修」に改称 ／ <b>v2.6 IPO体験を実装（応援でIPO進捗→上場で株価ジャンプ＋記念配当）／用語をノミネート→審査→パス→アップに変更／全自動運営・セキュリティを明記</b>。</p>
+      <p class="memo-log">v0.1 基本の上場マーケット ／ v0.7 クラファンから取引所へ（審査＋本人確認） ／ v1.0 ネット証券ホーム ／ v1.1 三段審査 ／ v1.2 名称統一 ／ v1.3 二層モデル ／ v1.4 IPO前→上場→流通に再定義 ／ v1.5 個別銘柄ページ ／ v1.7 板売買・チャートホバー ／ v1.8 指値発注・ポートフォリオ整列 ／ v1.9 上場審査＋事業ノートを「メモ」に収納 ／ v2.0 メモ再構成 ／ v2.1 事業モデルを前段へ・株主特典追加・発行株数＋チャート行内化 ／ v2.2 ランキング横はみ出し修正・チャート幅最適化 ／ v2.3 パスワード撤廃・「概要」タブ化 ／ v2.4 用語を4段階に厳密化 ／ v2.5 「上場研修」に改称 ／ v2.6 IPO体験を実装（応援でIPO進捗→上場で株価ジャンプ＋記念配当） ／ v2.7 IPO済に🏆マーク・売買に▲▼アイコン ／ <b>v2.8 用語を「上場申請→プレ上場→IPO→二次流通」に統一・ファーストビューをベネフィット先行に・ポートフォリオに分析パネル追加 ／ <b>v2.9 上場研修をインキュベーションとして再定義・ビジョン「経済をもっと創造的に。」を掲出</b>。</p>
     </div>
 
     <div class="memo-sec">
       <h3>✅ 決定ログ</h3>
       <table class="memo-tbl">
         <tr><td>名称</td><td>プロジェクトマーケット（PROJECT MARKET）。『プロジェクト大全』著者ブランドと地続き。</td></tr>
-        <tr><td>位置づけ</td><td>クラファンでなく証券取引所。ノミネート→審査→パス→アップ(LISTED)→PRE-IPO→IPO→二次流通(SECONDARY)。</td></tr>
-        <tr><td>主モード</td><td>二層で両立（アップ/PRE-IPO＝応援・非金銭 / IPO＝投資・配当）。</td></tr>
+        <tr><td>位置づけ</td><td>クラファンでなく証券取引所。上場申請→審査→プレ上場（IPO前）→IPO→二次流通(SECONDARY)。</td></tr>
+        <tr><td>主モード</td><td>二層で両立（プレ上場＝IPO前＝応援・非金銭 / IPO＝投資・配当）。</td></tr>
         <tr><td>審査</td><td>三段関門：本人確認（住民票・戸籍）→ 反社・AML → AI審査。入口は「応募」。</td></tr>
         <tr><td>参入障壁</td><td>審査は衛生要因。堀は ①流動性 ②免許 ③時間の信頼 ④発起人ブランド×上場研修。</td></tr>
         <tr><td>株価</td><td>証券化しない“指数”。実績×応援。値下がりで元本を痛めない設計。</td></tr>
@@ -739,15 +787,15 @@ function typeBadge(p){ return p.oneoff
    応援型（=体験・権利・優待の非金銭リターン）。ここに無いものは応援型。 */
 const TOSHI = new Set([6,9,15,16,18]);
 PROJECTS.forEach(p=>{ p.toshi = TOSHI.has(p.id); });
-/* IPO進捗：アップ(LISTED)からIPOまでの育ち具合(0〜100%)。あなたの応援で前進する。
-   IPO済(toshi)は100%。アップ後はraised率と応援者数から初期値を散らす。 */
+/* IPO進捗：プレ上場(IPO前)からIPOまでの育ち具合(0〜100%)。あなたの応援で前進する。
+   IPO済(toshi)は100%。プレ上場中はraised率と応援者数から初期値を散らす。 */
 PROJECTS.forEach(p=>{
   p.ipoDone = !!p.toshi;
   p.ipo = p.toshi ? 100 : Math.max(12, Math.min(90, Math.round((p.raised/p.goal)*55 + Math.min(28, p.supporters/60))));
 });
 function modeBadge(p){ return p.toshi
   ? `<span class="badge toshi">🏆 IPO済 · 配当</span>`
-  : `<span class="badge ouen">アップ · 応援期</span>`; }
+  : `<span class="badge ouen">プレ上場 · 応援期</span>`; }
 
 /* =========================================================
    画面の切り替え（マーケット / ポートフォリオ / 上場申請）
@@ -1045,7 +1093,7 @@ function progressReport(p){
     <div class="kpi"><div class="k">目標達成率</div><div class="v">${pct}%</div><div class="s">${yen(p.raised)}</div></div>
     <div class="kpi"><div class="k">直近30日</div><div class="v" style="color:var(--up)">+${growth}%</div><div class="s">評価の伸び</div></div>
     ${kpi3}</div>`;
-  const steps=["構想・チーム組成","審査をパス→アップ（LISTED）","マーケットで応援を集める","PRE-IPO：実績づくり（KPI）","IPO（投資対象化・配当解禁）"];
+  const steps=["構想・チーム組成","上場申請に通過→プレ上場","マーケットで応援を集める","実績づくり（KPI）でIPOへ","IPO（投資対象化・配当解禁）"];
   const doneCount = p.toshi ? 5 : (p.ipo>=85?4:(p.ipo>=40?3:2));
   const mstone=`<div class="mstone">`+steps.map((s,i)=>{
     const cls=i<doneCount-1?"done":(i===doneCount-1?"now":"");
@@ -1114,7 +1162,7 @@ function openModal(id){
     <div id="stock-body">${stockBody(p,up?'#2ec26b':'#ff5d6c',up,held)}</div>
     ${p.toshi
       ? `<div class="riskbox">📈 <b>IPO済（上場・投資対象）</b>　IPO（新規上場）を果たした銘柄です。売上・利益から<b>金銭で配当・分配</b>される代わりに、株価は上下し<b>元本割れ</b>することもあり、いずれ<b>二次流通（SECONDARY）</b>で売買も。（本番では第二種金融商品取引業の登録とリスク説明が必要）</div>`
-      : `<div class="ouenbox">🌱 <b>アップ中（LISTED／応援期）</b>　審査をパスしてマーケットにアップされた挑戦を、IPO前にいち早く応援できる“未公開株”の立場です。今のリターンは<b>体験・権利・優待</b>ですが、PRE-IPOで実績を出せば<b>IPO（上場）</b>して配当が解禁。株価が下がっても受け取れるお礼は目減りしません。</div>`}
+      : `<div class="ouenbox">🌱 <b>プレ上場（IPO前・応援期）</b>　審査を通過してプレ上場した挑戦を、IPOの前にいち早く応援できる“未公開株”の立場です。今のリターンは<b>体験・権利・優待</b>ですが、実績を出せば<b>IPO（上場）</b>して配当が解禁。株価が下がっても受け取れるお礼は目減りしません。</div>`}
     ${p.toshi
       ? `<div class="ipowrap"><div class="ipohd"><span>IPOステータス</span><span class="ipodone ipogold">🏆 上場済み（投資対象）</span></div><div class="ipobar"><span style="width:100%"></span></div></div>`
       : `<div class="ipowrap"><div class="ipohd"><span>IPO進捗（あなたの応援で上場へ）</span></div><div class="ipoline"><div class="ipobar"><span style="width:${Math.round(p.ipo)}%"></span></div><b>${Math.round(p.ipo)}%</b></div><div class="hint2">＋1株の応援で約2%前進。<b style="color:var(--text)">あと${Math.max(0,100-Math.round(p.ipo))}%</b>で<b style="color:var(--text)">IPO（上場）</b>＝保有者に上場記念配当。</div></div>`}
@@ -1129,6 +1177,7 @@ function openModal(id){
 /* =========================================================
    出資する：株を買うと株価が少し上がる（需要で上がるイメージ）
    ========================================================= */
+let DIV_TOTAL=0;   // 累計の受取配当（ポートフォリオ分析用）
 /* ===== IPOエンジン：応援でIPOまで前進 → 100%で上場（株価ジャンプ＋上場記念配当） ===== */
 function bumpIpo(p, qty){
   if(p.toshi || p.ipoDone) return false;
@@ -1143,7 +1192,7 @@ function doIPO(p){
   p.prev=p.price; p.price=Math.round(p.price*1.2); p.h.push(p.price);   // IPOで株価＋20%
   const held=PORTFOLIO[p.id]||0;
   const div = held>0 ? Math.round(p.price*held*0.08) : 0;               // 保有者に上場記念配当（現金）
-  if(div>0) CASH+=div;
+  if(div>0){ CASH+=div; DIV_TOTAL+=div; }
   document.getElementById("overlay").classList.remove("open");
   updateCash(); buildTicker(); renderGrid(); renderAccount(); renderRanking();
   if(!document.getElementById("view-portfolio").classList.contains("hidden")) renderPortfolio();
@@ -1196,6 +1245,15 @@ function join(id){
 /* =========================================================
    ポートフォリオ
    ========================================================= */
+const PF_PALETTE=['#7c6cff','#4ad0ff','#2ec26b','#ffcf6a','#ff8fb0','#a99dff','#7fe0a6','#ff9db0'];
+function donut(data,size,thick){
+  const total=data.reduce((s,d)=>s+d.value,0)||1, r=(size-thick)/2, c=size/2, circ=2*Math.PI*r;
+  let off=0;
+  const segs=data.map(d=>{ const len=(d.value/total)*circ;
+    const el=`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${d.color}" stroke-width="${thick}" stroke-dasharray="${len.toFixed(2)} ${(circ-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 ${c} ${c})"/>`;
+    off+=len; return el; }).join("");
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${segs}</svg>`;
+}
 function renderPortfolio(){
   const ids=Object.keys(PORTFOLIO).filter(id=>PORTFOLIO[id]>0);
   const holdings=document.getElementById("holdings");
@@ -1224,6 +1282,34 @@ function renderPortfolio(){
   const plEl=document.getElementById("pf-pl");
   plEl.textContent=(pl>=0?"+":"−")+yen(Math.abs(pl));
   plEl.className=(pl>=0?"up":"down");
+
+  // 分析パネル（総資産の内訳・累計配当・IPO済・平均進捗）
+  const insEl=document.getElementById("pf-insights");
+  if(insEl){
+    if(ids.length===0){
+      insEl.innerHTML=`<div class="pf-box"><div class="empty" style="padding:14px 4px">出資すると、資産の内訳・累計配当・IPO進捗がここに表示されます。</div></div>`;
+    } else {
+      const held=ids.map(id=>{ const p=PROJECTS.find(x=>x.id==id); return {p,q:PORTFOLIO[id],v:p.price*PORTFOLIO[id]}; });
+      const segs=held.map((h,i)=>({label:h.p.name, value:h.v, color:PF_PALETTE[i%PF_PALETTE.length]}));
+      segs.push({label:'現金', value:CASH, color:'#3a4356'});
+      const totalAll=CASH+value;
+      const legend=segs.map(s=>`<div class="lg"><span class="sw" style="background:${s.color}"></span><span class="nm">${s.label}</span><span class="vl">${Math.round(s.value/totalAll*100)}%</span></div>`).join("");
+      const ipoedN=held.filter(h=>h.p.toshi).length;
+      const preList=held.filter(h=>!h.p.toshi);
+      const preAvg=preList.length? Math.round(preList.reduce((s,h)=>s+h.p.ipo,0)/preList.length):0;
+      insEl.innerHTML=`
+        <div class="pf-box">
+          <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:12px">総資産の内訳</div>
+          <div class="pf-donut-wrap"><div>${donut(segs,148,22)}</div><div class="pf-legend">${legend}</div></div>
+          <div class="pf-stats">
+            <div class="pf-stat"><div class="k">累計 受取配当</div><div class="v gold">${yen(DIV_TOTAL)}</div></div>
+            <div class="pf-stat"><div class="k">🏆 IPO済 保有</div><div class="v">${ipoedN}銘柄</div></div>
+            <div class="pf-stat"><div class="k">プレ上場 応援中</div><div class="v">${preList.length}銘柄</div></div>
+            <div class="pf-stat"><div class="k">平均 IPO進捗</div><div class="v">${preAvg}%</div></div>
+          </div>
+        </div>`;
+    }
+  }
 }
 
 /* =========================================================
@@ -1246,7 +1332,7 @@ function renderPending(){
     let status,sub;
     if(x.status==="screening"){ status=`<span class="status scr"><span class="spin"></span>反社・AML照合中</span>`; sub=`本人確認：${x.doc}／発起人 ${x.founder}`; }
     else if(x.status==="reviewing"){ status=`<span class="status rev"><span class="spin"></span>AI審査中</span>`; sub=`反社・AMLチェック クリア／${x.cat}`; }
-    else if(x.status==="approved"){ status=`<span class="status ok">✓ 審査パス</span>`; sub=`本人確認・反社チェック・AI審査をパスし、マーケットにアップされました（LISTED）。`; }
+    else if(x.status==="approved"){ status=`<span class="status ok">✓ プレ上場承認</span>`; sub=`本人確認・反社チェック・AI審査を通過し、プレ上場しました（IPO前）。`; }
     else { status=`<span class="status ng">要再申請</span>`; sub=`否決理由：${x.reason}`; }
     return `<div class="pend"><div class="info"><b>${x.name}</b><div>${sub}</div></div>${status}</div>`;
   }).join("");
@@ -1262,7 +1348,7 @@ function aiReview(item){
       price:item.price, prev:Math.round(item.price*0.98), goal:item.goal, raised:0, supporters:1,
       seats:5, desc:item.desc, h:hist(item.price), oneoff:item.oneoff, deadline:item.oneoff?item.deadline:null});
     renderGrid();
-    toast(`✅ 審査をパス。「${item.name}」がマーケットにアップされました（LISTED）`);
+    toast(`✅ 審査を通過。「${item.name}」がプレ上場しました（IPO前）`);
   } else {
     item.status="rejected";
     item.reason="概要が不足しています。目的・実現性・実績をもう少し具体的に書いてください。";
