@@ -487,7 +487,7 @@
 
   <!-- ===== メモ（事業のぜんぶを収納） ===== -->
   <section id="view-memo" class="hidden">
-    <div class="sec-head"><h2>メモ ── この事業の概要</h2></div>
+    <div class="sec-head"><h2>メモ ── 事業の概要</h2></div>
     <div class="tagline" style="margin:-6px 2px 16px">デモの裏にある、コンセプト・決定・計画・審査をここに収納。<b>プロジェクトを“上場”させる、プロジェクトの証券取引所。</b> プロジェクトエコノミー時代の取引所。</div>
 
     <div class="memo-sec memo-launch">
@@ -723,7 +723,7 @@ function modeBadge(p){ return p.toshi
    パスワードゲート（関係者限定プレビュー）
    ※ 静的サイトのため簡易ロックです。パスワードは下記で変更できます。
    ========================================================= */
-const ACCESS_PASSWORD = "pm26";   // ← パスワードはここを書き換えて変更
+const ACCESS_PASSWORD = "prm";   // ← パスワードはここを書き換えて変更
 function normPw(s){ return (s||"").normalize("NFKC").replace(/\s+/g,"").toLowerCase(); }  // 全角→半角・空白除去・小文字化
 function tryGate(){
   const v=normPw(document.getElementById("gate-pw").value);
