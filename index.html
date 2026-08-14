@@ -720,6 +720,7 @@ function modeBadge(p){ return p.toshi
    ※ 静的サイトのため簡易ロックです。パスワードは下記で変更できます。
    ========================================================= */
 const ACCESS_PASSWORD = "prm";   // ← パスワードはここを書き換えて変更
+const GATE_ENABLED = false;      // ← パスワードのオン/オフ：true=要パスワード、false=誰でも閲覧可（今はオフ）
 function normPw(s){ return (s||"").normalize("NFKC").replace(/\s+/g,"").toLowerCase(); }  // 全角→半角・空白除去・小文字化
 function tryGate(){
   const v=normPw(document.getElementById("gate-pw").value);
@@ -727,6 +728,8 @@ function tryGate(){
   else { document.getElementById("gate-err").textContent="パスワードが違います"; document.getElementById("gate-pw").select(); }
 }
 (function(){
+  const gate=document.getElementById("gate");
+  if(!GATE_ENABLED){ if(gate) gate.style.display="none"; document.body.style.overflow=""; return; }
   document.body.style.overflow="hidden";
   const pw=document.getElementById("gate-pw");
   if(pw){ pw.addEventListener("keydown",e=>{ if(e.key==="Enter") tryGate(); }); setTimeout(()=>pw.focus(),200); }
