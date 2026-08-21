@@ -66,12 +66,13 @@
   .hero p{color:var(--muted);margin:0;font-size:15px;line-height:1.7}
   /* マーケット冒頭のベネフィット訴求 */
   .mkt-hero{padding:30px 0 4px}
-  .mkt-hero h1{font-size:25px;line-height:1.3;margin:0 0 6px;letter-spacing:-.01em}
+  .mkt-hero .mkt-eyebrow{color:#a99dff;font-size:13px;font-weight:800;letter-spacing:.02em;margin:0 0 8px}
+  .mkt-hero h1{font-size:33px;line-height:1.22;margin:0 0 8px;letter-spacing:-.02em;font-weight:800}
   .mkt-hero .mkt-lead{color:#c9c2ff;font-size:16px;font-weight:700;line-height:1.4;margin:0 0 12px;letter-spacing:-.01em}
   .mkt-hero p{color:var(--text);font-size:15px;line-height:1.75;margin:0;max-width:760px}
   .mkt-hero p b{color:#c9c2ff}
   .mkt-hero .mkt-sub{color:var(--muted);font-size:12.5px;margin-top:8px}
-  @media(max-width:640px){.mkt-hero{padding:18px 0 2px}.mkt-hero h1{font-size:20px}.mkt-hero .mkt-lead{font-size:14.5px}.mkt-hero p{font-size:14px}}
+  @media(max-width:640px){.mkt-hero{padding:18px 0 2px}.mkt-hero .mkt-eyebrow{font-size:12px}.mkt-hero h1{font-size:24px}.mkt-hero .mkt-lead{font-size:14.5px}.mkt-hero p{font-size:14px}}
   /* ポートフォリオ 2カラム＋分析パネル */
   .pf-layout{display:grid;grid-template-columns:1fr;gap:22px;align-items:start}
   @media(min-width:860px){.pf-layout{grid-template-columns:1.7fr 1fr}}
@@ -379,6 +380,14 @@
   .desc{color:#c3cad8;line-height:1.8;font-size:14px}
   .maturity{background:rgba(255,168,74,.10);border:1px solid rgba(255,168,74,.3);color:#ffd9ab;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;margin-bottom:4px}
   .maturity b{color:#ffb15e}
+  .phasebar{border-radius:12px;padding:10px 14px;margin:4px 0 2px;font-size:12px;line-height:1.62}
+  .phasebar .pb-tag{font-size:11px;font-weight:800;letter-spacing:.05em;margin-bottom:3px}
+  .phasebar .pb-txt{color:#d7dbe6}
+  .phasebar .pb-txt b{color:var(--text)}
+  .phasebar.pri{background:rgba(46,194,107,.08);border:1px solid rgba(46,194,107,.28)}
+  .phasebar.pri .pb-tag{color:#7fe0a6}
+  .phasebar.sec{background:rgba(124,108,255,.10);border:1px solid rgba(124,108,255,.30)}
+  .phasebar.sec .pb-tag{color:#a99dff}
   .riskbox{background:rgba(255,196,92,.10);border:1px solid rgba(255,196,92,.34);color:var(--text);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.65;margin-top:14px}
   .riskbox b{color:#ffcf6a}
   .ouenbox{background:rgba(46,194,107,.08);border:1px solid rgba(46,194,107,.28);color:var(--text);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.65;margin-top:14px}
@@ -397,6 +406,20 @@
   .hint{font-size:12px;color:var(--muted);margin-top:6px}
   .hint b{color:#c3cad8}
   /* 上場基準 */
+  /* 発起人にとってのIPO（供給側の動機）*/
+  .owner-ipo{border:1px solid rgba(255,196,92,.35);background:rgba(255,196,92,.05);border-radius:16px;padding:18px 20px;margin:6px 0 22px}
+  .owner-ipo .oi-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .owner-ipo .oi-head b{font-size:16px;color:#ffcf6a}
+  .owner-ipo .oi-head span{font-size:12.5px;color:var(--muted);font-weight:700}
+  .owner-ipo .oi-flow{font-size:13px;color:#d7dbe6;line-height:1.75;margin-bottom:14px}
+  .owner-ipo .oi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:720px){.owner-ipo .oi-grid{grid-template-columns:1fr}}
+  .owner-ipo .oi-card{background:rgba(13,16,23,.45);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .owner-ipo .oi-k{font-size:11px;font-weight:800;letter-spacing:.06em;color:#ffcf6a;margin-bottom:6px}
+  .owner-ipo .oi-t{font-size:14px;font-weight:800;line-height:1.4;margin-bottom:5px}
+  .owner-ipo .oi-d{font-size:12px;color:#bcc5d4;line-height:1.65}
+  .owner-ipo .oi-note{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+  .owner-ipo .oi-note b{color:var(--text)}
   .criteria{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
   .crit{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
   .crit .n{font-size:11px;font-weight:800;color:var(--brand);letter-spacing:.1em}
@@ -509,13 +532,13 @@
 <main class="wrap">
   <section id="view-market">
     <div class="mkt-hero">
-      <h1>経済をもっと創造的に。</h1>
-      <p class="mkt-lead">プロジェクトを経済活動の中心へ。</p>
+      <h1>プロジェクトが上場するマーケット。</h1>
+      <p class="mkt-lead">経済をもっと創造的に。</p>
       <p>まだ世の中にないプロジェクトがマーケットに並ぶ。<b>応援と実績によってプロジェクトが育ち</b>、やがて<b>IPO</b>へ。</p>
       <p class="mkt-sub">その仕組みは、クラウドファンディングではなくプロジェクトの“証券取引所”。〈プレ上場（IPO前）→ IPO（上場・配当）→ 二次流通〉。</p>
     </div>
     <!-- いま、動いている：切り口を切り替えて“動いている市場”を見る（既存カードUIを流用）-->
-    <div class="sec-head move-head"><h2>NOW MOVING <span class="sec-sub">動いているプロジェクト</span> <span class="live">LIVE</span></h2><div id="move-tabs"></div></div>
+    <div class="sec-head move-head"><h2>注目のプロジェクト <span class="sec-sub">急上昇・新着・応援・IPO接近で見る</span> <span class="live">LIVE</span></h2><div id="move-tabs"></div></div>
     <div id="moving" class="disc-strip"></div>
 
     <!-- ALL PROJECTS -->
@@ -556,6 +579,17 @@
     <div class="hero">
       <h1>プレ上場するには、上場申請の審査を通過する必要があります。</h1>
       <p>ここは、誰でも載せられるクラウドファンディングではありません。<br>プレ上場の前提として<b style="color:var(--text)">本人確認（住民票・戸籍謄本など）</b>と<b style="color:var(--text)">反社・AMLチェック</b>を行い、そのうえで提出内容を<b style="color:var(--text)">AIが審査基準に照らして審査</b>します。通過した挑戦だけが市場に並ぶ（＝プレ上場／LISTED）。だから出資する側は、"実在する人物の、審査を通った挑戦"にだけ向き合える。</p>
+    </div>
+
+    <div class="owner-ipo">
+      <div class="oi-head"><b>発起人にとってのIPO</b><span>上場すると、何が解禁されるか</span></div>
+      <div class="oi-flow">プレ上場で<b>一次調達</b>（応援＝発行枠の購入で、手数料を除いた資金が発起人に入る）→ 実績を満たして<b>IPO</b>で次の3つが解禁 → 上場後は二次流通で価値が育つ。</div>
+      <div class="oi-grid">
+        <div class="oi-card"><div class="oi-k">01 追加調達力</div><div class="oi-t">より大きく、安く集める</div><div class="oi-d">市場価格を土台に、追加発行でプレ上場より高い評価・大きな額を調達できる。成長の資金を継続して得られる。</div></div>
+        <div class="oi-card"><div class="oi-k">02 持ち分の換金</div><div class="oi-t">自分の取り分を現金化</div><div class="oi-d">二次流通が立ち、発起人は保有の一部を売って、長い挑戦の成果を初めて現金化できる（出口）。</div></div>
+        <div class="oi-card"><div class="oi-k">03 信用・実績</div><div class="oi-t">市場が認めた評価額</div><div class="oi-d">公開された株価と“上場した”実績が、採用・提携・取材・次の挑戦を呼び込む看板になる。</div></div>
+      </div>
+      <div class="oi-note">※ IPO後は配当・分配と情報開示の義務が生じます。<b>義務と引き換えに、上の「調達力・換金・信用」を得る</b>——それが発起人がIPOを目指す理由です。</div>
     </div>
 
     <h3 style="margin:8px 0 12px;font-size:15px;color:var(--muted);font-weight:700">審査の基準（上場申請で見るポイント）</h3>
@@ -1446,6 +1480,12 @@ function openModal(id){
         <div class="delta ${up?'u':'d'}" style="display:inline-block">${up?'▲':'▼'} ${Math.abs(d).toFixed(2)}%</div>
       </div>
     </div>
+    <div class="phasebar ${p.toshi?'sec':'pri'}">
+      <div class="pb-tag">${p.toshi?'流通市場 ・ 二次流通中（IPO済）':'発行市場 ・ 一次調達中（プレ上場）'}</div>
+      <div class="pb-txt">${p.toshi
+        ? '売買は参加者どうしで成立し、発起人には直接入りません。発起人は<b>追加発行での調達</b>と<b>持ち分の換金</b>ができる段階。株価は需給で動きます。'
+        : '応援＝<b>発行枠の購入</b>。集まった資金は手数料を除いて<b>発起人に入ります</b>（一次調達）。株価は募集の目安値で、応援が集まるほどIPOへ近づきます。'}</div>
+    </div>
     <div class="stabs">${["チャート","板","進捗レポート"].map(t=>`<button class="${t===stockTab?'active':''}" onclick="setStockTab(${p.id},'${t}')">${t}</button>`).join("")}</div>
     <div id="stock-body">${stockBody(p,up?'#2ec26b':'#ff5d6c',up,held)}</div>
     ${p.toshi
@@ -1717,7 +1757,10 @@ function buildTicker(){
     const d=((p.price-p.prev)/p.prev*100),up=d>=0;
     return `<span><b>${p.name}</b>${yen(p.price)} <span class="${up?'up':'down'}">${up?'▲':'▼'}${Math.abs(d).toFixed(1)}%</span></span>`;
   }).join("");
-  document.getElementById("ticker").innerHTML=t+t; // 2回並べて途切れなくループ
+  const track=document.getElementById("ticker");
+  track.innerHTML=t+t; // 2回並べて途切れなくループ
+  // 銘柄数が増えても“1銘柄あたりの流れる速さ”が一定になるよう時間を調整（落ち着いた速度）
+  track.style.animationDuration = Math.max(90, PROJECTS.length*4.6) + "s";
 }
 function updateCash(){ document.getElementById("cash").textContent=yen(CASH); }
 
